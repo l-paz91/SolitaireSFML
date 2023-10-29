@@ -128,10 +128,11 @@ void Deck::draw()
 
 void Deck::reset()
 {
-	// move all cards from the waste back to the stock
+	// move all cards from the waste back to the stock, flipping them back over again
 	while (!mWaste.isEmpty())
 	{
 		mStock.push(mWaste.peek());
+		mStock.peek()->flip();
 		mWaste.pop();
 	}
 

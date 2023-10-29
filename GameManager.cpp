@@ -48,17 +48,17 @@ void GameManager::processEvents(const sf::Event& pEvent)
 	// LMB released
 	if (pEvent.type == Event::MouseButtonReleased && pEvent.mouseButton.button == Mouse::Left)
 	{
-		// are we hovering over stock?
-		if (mDeck.isMouseOverStock(mousePosition))
-		{
-			mDeck.draw();
-		}
-
 		// is the stock empty?
 		if (mBlankSpace.getGlobalBounds().contains(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y)) 
 			&& mDeck.isStockEmpty())
 		{
 			mDeck.reset();
+		}
+
+		// are we hovering over stock?
+		if (mDeck.isMouseOverStock(mousePosition))
+		{
+			mDeck.draw();
 		}
 	}
 }
