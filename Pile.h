@@ -22,11 +22,11 @@
 class Pile
 {
 public:
-	Pile();
+	Pile(const sf::Vector2f& pPosition);
 	~Pile();
 
 	// add a card to the top of the pile
-	void push(const Card& pCard);
+	void push(Card* pCard);
 
 	// removes the top card from the pile
 	Card* pop();
@@ -43,8 +43,12 @@ public:
 	// get cards
 	std::vector<Card*>& getCards() { return mCards; }
 
+	// set position
+	void setPosition(const sf::Vector2f& pPosition) { mPosition = pPosition; }
+
 private:
 	std::vector<Card*> mCards;
+	sf::Vector2f mPosition;
 };
 
 // -----------------------------------------------------------------------------

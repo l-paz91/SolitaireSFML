@@ -7,6 +7,8 @@
 // -----------------------------------------------------------------------------
 
 Deck::Deck()
+	: mStock(sf::Vector2f(20.f, 20.f))
+	, mWaste(sf::Vector2f(160.f, 20.f))
 {
 	// create a deck of cards
 	// heart suit
@@ -14,7 +16,7 @@ Deck::Deck()
 	{
 		const std::string filename = "Graphics/Hearts/" + std::to_string(rank) + ".png";
 
-		mStock.push(Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(0), false, filename));
+		mStock.push(new Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(0), false, filename));
 	}
 
 	// diamond suit
@@ -22,7 +24,7 @@ Deck::Deck()
 	{
 		const std::string filename = "Graphics/Diamonds/" + std::to_string(rank) + ".png";
 
-		mStock.push(Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(1), false, filename));
+		mStock.push(new Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(1), false, filename));
 	}
 
 	// club suit
@@ -30,7 +32,7 @@ Deck::Deck()
 	{
 		const std::string filename = "Graphics/Clubs/" + std::to_string(rank) + ".png";
 
-		mStock.push(Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(2), false, filename));
+		mStock.push(new Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(2), false, filename));
 	}
 
 	// spade suit
@@ -38,7 +40,7 @@ Deck::Deck()
 	{
 		const std::string filename = "Graphics/Spades/" + std::to_string(rank) + ".png";
 
-		mStock.push(Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(3), false, filename));
+		mStock.push(new Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(3), false, filename));
 	}
 
 	// shuffle the deck
@@ -111,8 +113,11 @@ void Deck::draw()
 	}
 
 	// move the top card from the stock to the waste
-	mWaste.push(*mStock.peek());
+	mWaste.push(mStock.peek());
 	mStock.pop();
+
+	// flip the card so we can see it now
+	mWaste.peek()->flip();
 
 	// print the deck of cards
 	printStockToConsole();
@@ -126,7 +131,7 @@ void Deck::reset()
 	// move all cards from the waste back to the stock
 	while (!mWaste.isEmpty())
 	{
-		mStock.push(*mWaste.peek());
+		mStock.push(mWaste.peek());
 		mWaste.pop();
 	}
 

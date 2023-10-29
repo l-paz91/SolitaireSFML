@@ -76,6 +76,9 @@ void GameManager::update(sf::Time& pDeltaTime)
 void GameManager::render()
 {
 	mWindowRef.draw(mBlankSpace);
+
+	// render the deck pile (stock and waste)
+	mDeck.render(mWindowRef);
 }
 
 // -----------------------------------------------------------------------------

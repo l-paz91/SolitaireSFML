@@ -8,7 +8,8 @@
 
 // -----------------------------------------------------------------------------
 
-Pile::Pile()
+Pile::Pile(const sf::Vector2f& pPosition)
+	: mPosition(pPosition)
 {
 
 }
@@ -29,9 +30,10 @@ Pile::~Pile()
 
 // -----------------------------------------------------------------------------
 
-void Pile::push(const Card& pCard)
+void Pile::push(Card* pCard)
 {
-	mCards.push_back(new Card(pCard));
+	pCard->getSprite().setPosition(mPosition);
+	mCards.push_back(pCard);
 }
 
 // -----------------------------------------------------------------------------
