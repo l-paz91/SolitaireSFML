@@ -15,7 +15,7 @@ namespace GameFacilities
 {
 	// -----------------------------------------------------------------------------
 
-	constexpr int gWindowWidth = 1024;
+	constexpr int gWindowWidth = 1500;
 	constexpr int gWindowHeight = 768;
 
 	// -----------------------------------------------------------------------------
