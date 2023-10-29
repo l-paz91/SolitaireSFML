@@ -36,7 +36,8 @@ public:
 	~Card();
 
 	// core basics
-	void update(sf::Time& pDeltaTime);
+	void processEvents(const sf::Event& pEvent);
+	void update(sf::Time& pDeltaTime, sf::RenderWindow& pWindow);
 	void render(sf::RenderWindow& pWindow);
 
 	// flips the card from face-down to face-up or vice versa
@@ -46,9 +47,13 @@ private:
 	sf::Sprite mSprite;
 	std::string mTextureFilename;
 
+	sf::Vector2f mPosition;
+
 	ECardRank mRank;
 	ECardSuit mSuit;
+
 	bool mFaceUp;
+	bool mSelected;
 };
 
 // -----------------------------------------------------------------------------
