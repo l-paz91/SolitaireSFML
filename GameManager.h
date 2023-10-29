@@ -4,8 +4,12 @@
 // -----------------------------------------------------------------------------
 
 //--INCLUDES--//
+#include "Card.h"
+
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Time.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -20,6 +24,11 @@ public:
 	void render();
 
 private:
+	sf::Sprite mCardBackSprite;
+	sf::RectangleShape mBlankSpace;
+
+	Card mCard;
+
 	sf::RenderWindow& mWindowRef;
 };
 
