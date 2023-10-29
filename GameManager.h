@@ -5,6 +5,7 @@
 
 //--INCLUDES--//
 #include "Card.h"
+#include "Deck.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -26,10 +27,9 @@ public:
 private:
 	sf::Sprite mCardBackSprite;
 	sf::RectangleShape mBlankSpace;
-
-	Card mCard;
-
 	sf::RenderWindow& mWindowRef;
+
+	Deck mDeck;
 };
 
 // -----------------------------------------------------------------------------

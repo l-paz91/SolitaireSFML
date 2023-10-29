@@ -9,8 +9,7 @@
 // -----------------------------------------------------------------------------
 
 GameManager::GameManager(sf::RenderWindow& pWindow)
-	: mCard(ECardRank::eACE, ECardSuit::eSPADES, false, "Graphics/Spades/1.png")
-	, mWindowRef(pWindow)
+	: mWindowRef(pWindow)
 {
 	// set up card back sprite
 	mCardBackSprite.setTexture(TextureManager::getTexture("Graphics/BackDesign.png"));
@@ -35,10 +34,10 @@ GameManager::~GameManager()
 void GameManager::processEvents(const sf::Event& pEvent)
 {
 	using namespace sf;
-	const Vector2f mousePosition = static_cast<Vector2f>(Mouse::getPosition(mWindowRef));
+	const Vector2i mousePosition = Mouse::getPosition(mWindowRef);
 
 	// process card events
-	mCard.processEvents(pEvent);
+
 
 	// LMB pressed
 	if (pEvent.type == Event::MouseButtonPressed && pEvent.mouseButton.button == Mouse::Left)
@@ -49,10 +48,17 @@ void GameManager::processEvents(const sf::Event& pEvent)
 	// LMB released
 	if (pEvent.type == Event::MouseButtonReleased && pEvent.mouseButton.button == Mouse::Left)
 	{
-		// if mouse if hovering over the card and released, flip it
-		if (mCardBackSprite.getGlobalBounds().contains(mousePosition))
+		// are we hovering over stock?
+		if (mDeck.isMouseOverStock(mousePosition))
 		{
-			mCard.flip();
+			mDeck.draw();
+		}
+
+		// is the stock empty?
+		if (mBlankSpace.getGlobalBounds().contains(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y)) 
+			&& mDeck.isStockEmpty())
+		{
+			mDeck.reset();
 		}
 	}
 }
@@ -63,8 +69,6 @@ void GameManager::update(sf::Time& pDeltaTime)
 {
 	const float deltaTimeSeconds = pDeltaTime.asSeconds();
 
-	// update card
-	mCard.update(pDeltaTime, mWindowRef);
 }
 
 // -----------------------------------------------------------------------------
@@ -72,7 +76,6 @@ void GameManager::update(sf::Time& pDeltaTime)
 void GameManager::render()
 {
 	mWindowRef.draw(mBlankSpace);
-	mCard.render(mWindowRef);
 }
 
 // -----------------------------------------------------------------------------

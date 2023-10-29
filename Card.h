@@ -43,6 +43,12 @@ public:
 	// flips the card from face-down to face-up or vice versa
 	void flip();
 
+	// print card to console window
+	void printToConsole();
+
+	// get sprite
+	sf::Sprite& getSprite() { return mSprite; }
+
 private:
 	sf::Sprite mSprite;
 	std::string mTextureFilename;
