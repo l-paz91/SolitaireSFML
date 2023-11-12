@@ -46,6 +46,10 @@ public:
 	// is the stock empty?
 	bool isStockEmpty() { return mStock.isEmpty(); }
 
+	// peek the top card of the stock
+	Card* peekStock() { return mStock.peek(); }
+	void popStock() { mStock.pop(); }
+
 private:
 	Pile mStock;
 	Pile mWaste;

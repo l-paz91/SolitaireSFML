@@ -4,6 +4,7 @@
 #include "Pile.h"
 
 #include <algorithm>
+#include <iostream>
 #include <random>
 
 // -----------------------------------------------------------------------------
@@ -59,6 +60,18 @@ void Pile::shuffle()
 	std::random_device rd;
 	std::mt19937 g(rd());
 	std::shuffle(mCards.begin(), mCards.end(), g);
+}
+
+// -----------------------------------------------------------------------------
+
+void Pile::printToConsole()
+{
+	for (Card* card : mCards)
+	{
+		card->printToConsole();
+		std::cout << ' ';
+	}
+	std::cout << '\n';
 }
 
 // -----------------------------------------------------------------------------

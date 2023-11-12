@@ -20,6 +20,12 @@ GameManager::GameManager(sf::RenderWindow& pWindow)
 	mBlankSpace.setSize(sf::Vector2f(mCardBackSprite.getGlobalBounds().width, mCardBackSprite.getGlobalBounds().height));
 	mBlankSpace.setFillColor(sf::Color(111, 78, 55));
 	mBlankSpace.setPosition(20.f, 20.f);
+
+	// set up the tableau piles
+	for (int i = 0; i < 7; ++i)
+	{
+		mTableaus.push_back(Tableau(sf::Vector2f(20.f + (i * 140.f), 20.f)));
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -27,6 +33,13 @@ GameManager::GameManager(sf::RenderWindow& pWindow)
 GameManager::~GameManager()
 {
 
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::init()
+{
+	beginGame();
 }
 
 // -----------------------------------------------------------------------------
@@ -79,6 +92,34 @@ void GameManager::render()
 
 	// render the deck pile (stock and waste)
 	mDeck.render(mWindowRef);
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::beginGame()
+{
+	// deal cards to tableau piles from the deck
+	for (int i = 0; i < 7; ++i)
+	{
+		for (int j = 0; j < i + 1; ++j)
+		{
+			// deal cards from the deck to the tableau piles
+			mTableaus[i].push(mDeck.peekStock());
+			mDeck.popStock();
+		}
+	}
+
+	// flip the top card of each tableau pile
+	for (int i = 0; i < 7; ++i)
+	{
+		mTableaus[i].peek()->flip();
+	}
+
+	// print the tableau piles
+	for (int i = 0; i < 7; ++i)
+	{
+		mTableaus[i].printToConsole();
+	}
 }
 
 // -----------------------------------------------------------------------------

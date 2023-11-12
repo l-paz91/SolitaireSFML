@@ -36,6 +36,7 @@ int main()
 
 	// Set up Game Manager
 	GameManager gameManager(mainWindow);
+	gameManager.init();
 
 	// start the game loop
 	while (mainWindow.isOpen())

@@ -46,6 +46,9 @@ public:
 	// set position
 	void setPosition(const sf::Vector2f& pPosition) { mPosition = pPosition; }
 
+	// debug print to console
+	void printToConsole();
+
 private:
 	std::vector<Card*> mCards;
 	sf::Vector2f mPosition;

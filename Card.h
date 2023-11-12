@@ -49,6 +49,15 @@ public:
 	// get sprite
 	sf::Sprite& getSprite() { return mSprite; }
 
+	// get rank
+	ECardRank getRank() { return mRank; }
+
+	// get suit
+	ECardSuit getSuit() { return mSuit; }
+
+	bool isRed() const { return mSuit == eHEARTS || mSuit == eDIAMONDS; }
+	bool isBlack() const { return mSuit == eCLUBS || mSuit == eSPADES; }
+
 private:
 	sf::Sprite mSprite;
 	std::string mTextureFilename;
