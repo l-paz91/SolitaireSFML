@@ -15,7 +15,7 @@ namespace GameFacilities
 {
 	// -----------------------------------------------------------------------------
 
-	constexpr int gWindowWidth = 1500;
+	constexpr int gWindowWidth = 1004;
 	constexpr int gWindowHeight = 768;
 
 	const std::string gCardBackFilename = "Graphics/BackDesign.png";

@@ -36,6 +36,9 @@
     <ClCompile Include="Tableau.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Foundation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameFacilities.h">
@@ -60,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Tableau.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Foundation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

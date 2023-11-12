@@ -6,6 +6,7 @@
 //--INCLUDES--//
 #include "Card.h"
 #include "Deck.h"
+#include "Foundation.h"
 #include "Tableau.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -37,6 +38,7 @@ private:
 
 	Deck mDeck;
 	std::vector<Tableau> mTableaus;
+	std::vector<Foundation> mFoundations;
 };
 
 // -----------------------------------------------------------------------------

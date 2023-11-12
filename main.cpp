@@ -32,7 +32,7 @@ int main()
 
 	// create the background sprite
 	Sprite backgroundSprite;
-	backgroundSprite.setTexture(TextureManager::getTexture("Graphics/Background3.jpg"));
+	backgroundSprite.setTexture(TextureManager::getTexture("Graphics/Background4.png"));
 
 	// Set up Game Manager
 	GameManager gameManager(mainWindow);

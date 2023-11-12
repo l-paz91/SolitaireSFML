@@ -18,7 +18,7 @@ GameManager::GameManager(sf::RenderWindow& pWindow)
 
 	// set up the blank space
 	mBlankSpace.setSize(sf::Vector2f(mCardBackSprite.getGlobalBounds().width, mCardBackSprite.getGlobalBounds().height));
-	mBlankSpace.setFillColor(sf::Color(111, 78, 55));
+	mBlankSpace.setFillColor(sf::Color(27, 18, 18));
 	mBlankSpace.setPosition(20.f, 20.f);
 
 	// set up the tableau piles
@@ -30,6 +30,17 @@ GameManager::GameManager(sf::RenderWindow& pWindow)
 	{
 		float tableauX = tableauStart + (tableauWidth * i);
 		mTableaus.push_back(Tableau(sf::Vector2f(tableauX, tableauHeight)));
+	}
+
+	// set up the foundation piles
+	constexpr float foundationStart = 440.f;
+	constexpr float foundationWidth = 140.f;
+	constexpr float foundationHeight = 20.f;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		float foundationX = foundationStart + (foundationWidth * i);
+		mFoundations.push_back(Foundation(sf::Vector2f(foundationX, foundationHeight)));
 	}
 }
 
@@ -99,9 +110,15 @@ void GameManager::render()
 	mDeck.render(mWindowRef);
 
 	// render the tableau piles
-	for (int i = 0; i < 7; ++i)
+	for (uint32_t i = 0; i < mTableaus.size(); ++i)
 	{
 		mTableaus[i].render(mWindowRef);
+	}
+
+	// render the foundation piles
+	for (uint32_t i = 0; i < mFoundations.size(); ++i)
+	{
+		mFoundations[i].render(mWindowRef);
 	}
 }
 

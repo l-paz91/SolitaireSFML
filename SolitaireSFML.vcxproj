@@ -163,6 +163,10 @@
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Foundation.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="GameManager.cpp">
       <SubType>
       </SubType>
@@ -186,6 +190,10 @@
       </SubType>
     </ClInclude>
     <ClInclude Include="Deck.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="Foundation.h">
       <SubType>
       </SubType>
     </ClInclude>
