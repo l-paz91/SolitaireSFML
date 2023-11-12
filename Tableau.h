@@ -53,6 +53,9 @@ public:
 	// debug print to console
 	void printToConsole();
 
+	// core functions
+	void render(sf::RenderWindow& pWindow);
+
 private:
 	bool isCardValid(Card* pCard, Card* pCardAbove);
 	bool areCardsValid(std::vector<Card*>& pCards);

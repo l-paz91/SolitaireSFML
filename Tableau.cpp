@@ -89,6 +89,23 @@ void Tableau::printToConsole()
 
 // -----------------------------------------------------------------------------
 
+void Tableau::render(sf::RenderWindow& pWindow)
+{
+	if (!isEmpty())
+	{
+		// render the top card
+		peek()->render(pWindow);
+
+		// render the rest of the cards
+		//for (int i = 1; i < mCards.size(); ++i)
+		//{
+			//mCards[i]->render(pWindow);
+		//}
+	}
+}
+
+// -----------------------------------------------------------------------------
+
 bool Tableau::isCardValid(Card* pCard, Card* pCardAbove)
 {
 	const bool isOppositeColor = pCard->isRed() != pCardAbove->isRed();

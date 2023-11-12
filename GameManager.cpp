@@ -22,9 +22,14 @@ GameManager::GameManager(sf::RenderWindow& pWindow)
 	mBlankSpace.setPosition(20.f, 20.f);
 
 	// set up the tableau piles
+	constexpr float tableauStart = 20.f;
+	constexpr float tableauWidth = 140.f;
+	constexpr float tableauHeight = 200.f;
+
 	for (int i = 0; i < 7; ++i)
 	{
-		mTableaus.push_back(Tableau(sf::Vector2f(20.f + (i * 140.f), 20.f)));
+		float tableauX = tableauStart + (tableauWidth * i);
+		mTableaus.push_back(Tableau(sf::Vector2f(tableauX, tableauHeight)));
 	}
 }
 
@@ -92,6 +97,12 @@ void GameManager::render()
 
 	// render the deck pile (stock and waste)
 	mDeck.render(mWindowRef);
+
+	// render the tableau piles
+	for (int i = 0; i < 7; ++i)
+	{
+		mTableaus[i].render(mWindowRef);
+	}
 }
 
 // -----------------------------------------------------------------------------
