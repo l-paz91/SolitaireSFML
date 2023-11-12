@@ -93,14 +93,17 @@ void Tableau::render(sf::RenderWindow& pWindow)
 {
 	if (!isEmpty())
 	{
-		// render the top card
-		peek()->render(pWindow);
+		// render the cards, they should be face down and offset apart from the
+		// top card
 
-		// render the rest of the cards
-		//for (int i = 1; i < mCards.size(); ++i)
-		//{
-			//mCards[i]->render(pWindow);
-		//}
+		const float startY = getPosition().y;
+		const float offset = 20.f;
+
+		for (uint32_t i = 0; i < getCards().size(); ++i)
+		{
+			getCards()[i]->setPosition(sf::Vector2f(getPosition().x, startY + offset * i));
+			getCards()[i]->render(pWindow);
+		}
 	}
 }
 

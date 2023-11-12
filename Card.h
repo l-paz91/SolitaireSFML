@@ -58,6 +58,8 @@ public:
 	bool isRed() const { return mSuit == eHEARTS || mSuit == eDIAMONDS; }
 	bool isBlack() const { return mSuit == eCLUBS || mSuit == eSPADES; }
 
+	void setPosition(const sf::Vector2f& pPosition) { mSprite.setPosition(pPosition); }
+
 private:
 	sf::Sprite mSprite;
 	std::string mTextureFilename;

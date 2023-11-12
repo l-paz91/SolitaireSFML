@@ -43,8 +43,8 @@ public:
 	// get cards
 	std::vector<Card*>& getCards() { return mCards; }
 
-	// set position
 	void setPosition(const sf::Vector2f& pPosition) { mPosition = pPosition; }
+	const sf::Vector2f& getPosition() const { return mPosition; }
 
 	// debug print to console
 	void printToConsole();
