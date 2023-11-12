@@ -73,6 +73,7 @@ void Deck::render(sf::RenderWindow& pWindow)
 	}
 }
 
+
 // -----------------------------------------------------------------------------
 
 void Deck::printStockToConsole()

@@ -50,6 +50,9 @@ public:
 	Card* peekStock() { return mStock.peek(); }
 	void popStock() { mStock.pop(); }
 
+	Pile& getStock() { return mStock; }
+	Pile& getWaste() { return mWaste; }
+
 private:
 	Pile mStock;
 	Pile mWaste;

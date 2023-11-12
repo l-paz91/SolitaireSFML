@@ -7,6 +7,8 @@
 #include "Card.h"
 
 #include <vector>
+#include <SFML/Window/Event.hpp>
+#include <SFML/System/Time.hpp>
 
 // -----------------------------------------------------------------------------
 

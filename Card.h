@@ -36,8 +36,6 @@ public:
 	~Card();
 
 	// core basics
-	void processEvents(const sf::Event& pEvent);
-	void update(sf::Time& pDeltaTime, sf::RenderWindow& pWindow);
 	void render(sf::RenderWindow& pWindow);
 
 	// flips the card from face-down to face-up or vice versa

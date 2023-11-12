@@ -67,7 +67,6 @@ void GameManager::processEvents(const sf::Event& pEvent)
 
 	// process card events
 
-
 	// LMB pressed
 	if (pEvent.type == Event::MouseButtonPressed && pEvent.mouseButton.button == Mouse::Left)
 	{
