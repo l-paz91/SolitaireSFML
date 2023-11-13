@@ -32,6 +32,14 @@ public:
 	void beginGame();
 
 private:
+	Card* getCardAtMousePosition();
+
+	Pile* findPileContainingCard(Card* pSelectedCard);
+	Pile* getPileAtMousePosition();
+
+	void updateDraggedCardPosition(const sf::Vector2f& pNewPosition);
+	void resetDraggedCardPosition();
+
 	sf::Sprite mCardBackSprite;
 	sf::RectangleShape mBlankSpace;
 	sf::RenderWindow& mWindowRef;
@@ -39,6 +47,13 @@ private:
 	Deck mDeck;
 	std::vector<Tableau> mTableaus;
 	std::vector<Foundation> mFoundations;
+
+	Card* mDraggedCard;
+	Pile* mDraggedCardOriginalPile;
+	sf::Vector2f mDraggedCardOriginalPosition;
+	sf::Vector2f mDraggedCardOffset;
+
+	bool mIsCardBeingDragged;
 };
 
 // -----------------------------------------------------------------------------

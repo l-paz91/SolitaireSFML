@@ -50,6 +50,9 @@ public:
 	Card* peekStock() { return mStock.peek(); }
 	void popStock() { mStock.pop(); }
 
+	// peek the top card of the waste
+	Card* peekWaste() { return mWaste.peek(); }
+
 	Pile& getStock() { return mStock; }
 	Pile& getWaste() { return mWaste; }
 

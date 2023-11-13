@@ -40,7 +40,7 @@ public:
 	~Foundation();
 
 	// checks if a card can be moved to the foundation
-	bool isValidMove(Card* pCard);
+	virtual bool isValidMove(Card* pCard) override;
 
 	// debug print to console
 	void printToConsole();

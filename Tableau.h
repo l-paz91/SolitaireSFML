@@ -47,7 +47,7 @@ public:
 	~Tableau();
 
 	// checks if a card can be moved to the tableau
-	bool isValidMove(Card* pCard);
+	virtual bool isValidMove(Card* pCard) override;
 	bool isValidMove(std::vector<Card*>& pCards);
 
 	// debug print to console
@@ -55,6 +55,8 @@ public:
 
 	// core functions
 	void render(sf::RenderWindow& pWindow);
+	
+	void setStartingPositions();
 
 private:
 	bool isCardValid(Card* pCard, Card* pCardAbove);

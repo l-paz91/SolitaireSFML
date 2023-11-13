@@ -70,7 +70,19 @@ void GameManager::processEvents(const sf::Event& pEvent)
 	// LMB pressed
 	if (pEvent.type == Event::MouseButtonPressed && pEvent.mouseButton.button == Mouse::Left)
 	{
+		if (Card* selectedCard = getCardAtMousePosition())
+		{
+			if (!mIsCardBeingDragged)
+			{
+				// start dragging the card
+				mIsCardBeingDragged = true;
+				mDraggedCardOriginalPile = findPileContainingCard(selectedCard);
+				mDraggedCard = selectedCard;
+				mDraggedCardOriginalPosition = mDraggedCard->getSprite().getPosition();
 
+				mDraggedCardOffset = mDraggedCardOriginalPosition - static_cast<sf::Vector2f>(mousePosition);
+			}
+		}
 	}
 
 	// LMB released
@@ -84,9 +96,34 @@ void GameManager::processEvents(const sf::Event& pEvent)
 		}
 
 		// are we hovering over stock?
-		if (mDeck.isMouseOverStock(mousePosition))
+		if (mDeck.isMouseOverStock(mousePosition) && !mIsCardBeingDragged)
 		{
 			mDeck.draw();
+		}
+
+		// are dragging a card and releasing it?
+		if (mIsCardBeingDragged)
+		{
+			Pile* targetPile = getPileAtMousePosition();
+			if (targetPile && targetPile->isValidMove(mDraggedCard))
+			{
+				// move the card to the target pile
+				targetPile->push(mDraggedCard);
+				mDraggedCardOriginalPile->pop();
+
+				// flip the top card of the original pile
+				if (mDraggedCardOriginalPile->peek())
+				{	
+					mDraggedCardOriginalPile->peek()->flip();
+				}
+			}
+			else
+			{
+				// invalid move, snap card back to its original position
+				resetDraggedCardPosition();
+			}
+
+			mIsCardBeingDragged = false;
 		}
 	}
 }
@@ -97,6 +134,14 @@ void GameManager::update(sf::Time& pDeltaTime)
 {
 	const float deltaTimeSeconds = pDeltaTime.asSeconds();
 
+	if (mIsCardBeingDragged && mDraggedCard)
+	{
+		// get the mouse position
+		const sf::Vector2f mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(mWindowRef));
+		sf::Vector2f newPosition = mousePosition + mDraggedCardOffset;
+
+		updateDraggedCardPosition(newPosition);
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -119,6 +164,11 @@ void GameManager::render()
 	{
 		mFoundations[i].render(mWindowRef);
 	}
+
+	if (mDraggedCard && mIsCardBeingDragged)
+	{
+		mDraggedCard->render(mWindowRef);
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -134,6 +184,8 @@ void GameManager::beginGame()
 			mTableaus[i].push(mDeck.peekStock());
 			mDeck.popStock();
 		}
+
+		mTableaus[i].setStartingPositions();
 	}
 
 	// flip the top card of each tableau pile
@@ -147,6 +199,128 @@ void GameManager::beginGame()
 	{
 		mTableaus[i].printToConsole();
 	}
+}
+
+// -----------------------------------------------------------------------------
+
+Card* GameManager::getCardAtMousePosition()
+{
+	// this will be the top card of any pile for the moment
+	Card* card = nullptr;
+
+	// get the mouse position
+	const sf::Vector2f mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(mWindowRef));
+
+	// check the tableau piles
+	for (uint32_t i = 0; i < mTableaus.size(); ++i)
+	{
+		if (mTableaus[i].isMouseOverTopCard(mousePosition))
+		{
+			card = mTableaus[i].peek();
+			break;
+		}
+	}
+
+	// check the foundation piles
+	for (uint32_t i = 0; i < mFoundations.size(); ++i)
+	{
+		if (mFoundations[i].isMouseOverTopCard(mousePosition))
+		{
+			card = mFoundations[i].peek();
+			break;
+		}
+	}
+
+	// check the waste pile
+	if (mDeck.isMouseOverWaste(sf::Mouse::getPosition(mWindowRef)))
+	{
+		card = mDeck.peekWaste();
+	}
+
+	return card;
+}
+
+// -----------------------------------------------------------------------------
+
+Pile* GameManager::findPileContainingCard(Card* pSelectedCard)
+{
+// check the tableau piles
+	for (uint32_t i = 0; i < mTableaus.size(); ++i)
+	{
+		if (mTableaus[i].isCardInPile(pSelectedCard))
+		{
+			return &mTableaus[i];
+		}
+	}
+
+	// check the foundation piles
+	for (uint32_t i = 0; i < mFoundations.size(); ++i)
+	{
+		if (mFoundations[i].isCardInPile(pSelectedCard))
+		{
+			return &mFoundations[i];
+		}
+	}
+
+	// check the top card of the waste pile
+	if (mDeck.peekWaste() == pSelectedCard)
+	{
+		return &mDeck.getWaste();
+	}
+
+	return nullptr;
+}
+
+// -----------------------------------------------------------------------------
+
+Pile* GameManager::getPileAtMousePosition()
+{
+	// this will be the top card of any pile for the moment
+	Pile* pile = nullptr;
+
+	// get the mouse position
+	const sf::Vector2f mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(mWindowRef));
+
+	// check the tableau piles
+	for (uint32_t i = 0; i < mTableaus.size(); ++i)
+	{
+		if (mTableaus[i].isMouseOverTopCard(mousePosition))
+		{
+			pile = &mTableaus[i];
+			break;
+		}
+	}
+
+	// check the foundation piles
+	for (uint32_t i = 0; i < mFoundations.size(); ++i)
+	{
+		if (mFoundations[i].isMouseOverTopCard(mousePosition))
+		{
+			pile = &mFoundations[i];
+			break;
+		}
+	}
+
+	return pile;
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::updateDraggedCardPosition(const sf::Vector2f& pNewPosition)
+{
+	// update the position of the card being dragged
+	mDraggedCard->setPosition(pNewPosition);
+
+	// update the position of the card being dragged children
+	// to do
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::resetDraggedCardPosition()
+{
+	// reset the position of the card being dragged
+	mDraggedCard->setPosition(mDraggedCardOriginalPosition);
 }
 
 // -----------------------------------------------------------------------------

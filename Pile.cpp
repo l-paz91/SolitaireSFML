@@ -75,5 +75,32 @@ void Pile::printToConsole()
 }
 
 // -----------------------------------------------------------------------------
+
+bool Pile::isMouseOverTopCard(const sf::Vector2f& pMousePos)
+{
+	if (mCards.empty())
+	{
+		return false;
+	}
+
+	return mCards.back()->getSprite().getGlobalBounds().contains(pMousePos);
+}
+
+// -----------------------------------------------------------------------------
+
+bool Pile::isCardInPile(Card* pCard)
+{
+	for (Card* card : mCards)
+	{
+		if (card == pCard)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

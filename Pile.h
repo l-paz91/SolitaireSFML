@@ -51,6 +51,14 @@ public:
 	// debug print to console
 	void printToConsole();
 
+	// is mouse over top card in pile
+	bool isMouseOverTopCard(const sf::Vector2f& pMousePos);
+
+	// is card in pile
+	bool isCardInPile(Card* pCard);
+
+	virtual bool isValidMove(Card* pCard) { return false; };
+
 private:
 	std::vector<Card*> mCards;
 	sf::Vector2f mPosition;

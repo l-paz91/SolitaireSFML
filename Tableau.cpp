@@ -12,7 +12,6 @@
 Tableau::Tableau(const sf::Vector2f& pPosition)
 	: Pile(pPosition)
 {
-
 }
 
 // -----------------------------------------------------------------------------
@@ -93,17 +92,23 @@ void Tableau::render(sf::RenderWindow& pWindow)
 {
 	if (!isEmpty())
 	{
-		// render the cards, they should be face down and offset apart from the
-		// top card
-
-		const float startY = getPosition().y;
-		const float offset = 20.f;
-
-		for (uint32_t i = 0; i < getCards().size(); ++i)
+		for(uint32_t i = 0; i < getCards().size(); ++i)
 		{
-			getCards()[i]->setPosition(sf::Vector2f(getPosition().x, startY + offset * i));
 			getCards()[i]->render(pWindow);
 		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+void Tableau::setStartingPositions()
+{
+	const float startY = getPosition().y;
+	const float offset = 20.f;
+
+	for (uint32_t i = 0; i < getCards().size(); ++i)
+	{
+		getCards()[i]->setPosition(sf::Vector2f(getPosition().x, startY + offset * i));
 	}
 }
 
