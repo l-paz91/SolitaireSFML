@@ -92,6 +92,47 @@ bool Tableau::isValidMove(std::vector<Card*>& pCards)
 
 // -----------------------------------------------------------------------------
 
+bool Tableau::isValidSequence(Card* pCard, std::vector<Card*>& pOutCardSequence)
+{
+	// are we trying to drag a sequence of cards?
+	int cardIndex = getCardIndex(pCard);
+
+	// start at the end of the cards and work backwards up to the card we are trying to drag
+	for (int i = static_cast<int>(getCards().size()) - 1; i >= cardIndex; --i)
+	{
+		int cardAboveIndex = i - 1;
+		if (cardAboveIndex < 0)
+		{
+			pOutCardSequence.insert(pOutCardSequence.begin(), getCards()[i]);
+			break;
+		}
+
+		// is the card above a valid card in the sequence?
+		if (isCardValid(getCards()[i], getCards()[i-1]))
+		{
+			// add the card to the front to keep order
+			pOutCardSequence.insert(pOutCardSequence.begin(), getCards()[i]);
+		}
+		else
+		{
+			// the sequence has stopped, add the current card and break
+			pOutCardSequence.insert(pOutCardSequence.begin(), getCards()[i]);
+			break;
+		}
+	}
+
+	if (pOutCardSequence.size() > 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+// -----------------------------------------------------------------------------
+
 void Tableau::push(Card* pCard)
 {
 	if (getCards().empty())
@@ -157,7 +198,7 @@ void Tableau::render(sf::RenderWindow& pWindow)
 void Tableau::setStartingPositions()
 {
 	const float startY = getPosition().y;
-	const float offset = 20.f;
+	const float offset = TableauPrivate::Y_OFFSET;
 
 	for (uint32_t i = 0; i < getCards().size(); ++i)
 	{
@@ -176,7 +217,7 @@ bool Tableau::isCardValid(Card* pCard, Card* pCardAbove)
 	const bool isOppositeColor = pCard->isRed() != pCardAbove->isRed();
 	const bool isOneRankLower = pCard->getRank() == pCardAbove->getRank() - 1;
 
-	if (isOppositeColor && isOneRankLower)
+	if (isOppositeColor && isOneRankLower && pCard->isFaceUp())
 	{
 		return true;
 	}
@@ -205,6 +246,21 @@ bool Tableau::areCardsValid(std::vector<Card*>& pCards)
 	}
 
 	return true;
+}
+
+// -----------------------------------------------------------------------------
+
+int Tableau::getCardIndex(Card* pCard)
+{
+	for(int i = 0; i < getCards().size(); ++i)
+	{
+		if (getCards()[i] == pCard)
+		{
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 // -----------------------------------------------------------------------------

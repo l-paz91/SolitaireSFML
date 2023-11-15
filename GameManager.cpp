@@ -72,15 +72,25 @@ void GameManager::processEvents(const sf::Event& pEvent)
 	{
 		if (!mIsCardBeingDragged)
 		{
-			if (Card* selectedCard = getCardAtMousePosition())
+			std::vector<Card*> selectedCards = getCardsAtMousePosition(mousePosition);
+			if (selectedCards.size() > 0)
 			{
-				// start dragging the card
 				mIsCardBeingDragged = true;
-				mDraggedCardOriginalPile = findPileContainingCard(selectedCard);
-				mDraggedCard = selectedCard;
-				mDraggedCardOriginalPosition = mDraggedCard->getSprite().getPosition();
+				mDraggedCardOriginalPile = findPileContainingCard(selectedCards[0]);
 
-				mDraggedCardOffset = mDraggedCardOriginalPosition - static_cast<sf::Vector2f>(mousePosition);
+				// are we dragging single or multiple cards?
+				if (selectedCards.size() == 1)
+				{
+					// start dragging the card
+					mDraggedCard = selectedCards[0];
+					mDraggedCardOriginalPosition = mDraggedCard->getSprite().getPosition();
+					mDraggedCardOffset = mDraggedCardOriginalPosition - static_cast<sf::Vector2f>(mousePosition);
+				}
+				else
+				{
+					mDraggedCards = selectedCards;
+					setDraggedCardsOriginalPositions();
+				}
 			}
 		}
 	}
@@ -102,28 +112,39 @@ void GameManager::processEvents(const sf::Event& pEvent)
 		}
 
 		// are dragging a card and releasing it?
-		if (mIsCardBeingDragged && mDraggedCard)
+		if (mIsCardBeingDragged)
 		{
-			Pile* targetPile = getPileAtMousePosition();
-			if (targetPile && targetPile->isValidMove(mDraggedCard))
+			if (mDraggedCard)
 			{
-				// move the card to the target pile
-				targetPile->push(mDraggedCard);
-				mDraggedCardOriginalPile->pop();
+				Pile* targetPile = getPileAtMousePosition();
+				if (targetPile && targetPile->isValidMove(mDraggedCard))
+				{
+					// move the card to the target pile
+					targetPile->push(mDraggedCard);
+					mDraggedCardOriginalPile->pop();
 
-				// flip the top card of the original pile
-				if (Card* peekedCard = mDraggedCardOriginalPile->peek())
-				{	
-					if (!peekedCard->isFaceUp())
-					{
-						peekedCard->flip();
+					// flip the top card of the original pile
+					if (Card* peekedCard = mDraggedCardOriginalPile->peek())
+					{	
+						if (!peekedCard->isFaceUp())
+						{
+							peekedCard->flip();
+						}
 					}
 				}
+				else
+				{
+					// invalid move, snap card back to its original position
+					resetDraggedCardPosition();
+				}
+
+				mDraggedCard = nullptr;
 			}
 			else
 			{
-				// invalid move, snap card back to its original position
-				resetDraggedCardPosition();
+				resetDraggedCardsPosition();
+				mDraggedCards.clear();
+				mDraggedCardsOriginalPositions.clear();
 			}
 
 			mIsCardBeingDragged = false;
@@ -137,13 +158,28 @@ void GameManager::update(sf::Time& pDeltaTime)
 {
 	const float deltaTimeSeconds = pDeltaTime.asSeconds();
 
-	if (mIsCardBeingDragged && mDraggedCard)
+	if (mIsCardBeingDragged)
 	{
 		// get the mouse position
 		const sf::Vector2f mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(mWindowRef));
 		sf::Vector2f newPosition = mousePosition + mDraggedCardOffset;
 
-		updateDraggedCardPosition(newPosition);
+		if (mDraggedCard)
+		{
+			sf::Vector2f newPosition = mousePosition + mDraggedCardOffset;
+			updateDraggedCardPosition(newPosition);
+		}
+		else
+		{
+			const float yOffset = 30.f;
+			// we're dragging multiple cards
+			for (uint32_t i = 0; i < mDraggedCards.size(); ++i)
+			{
+				sf::Vector2f newPosition = mousePosition + mDraggedCardOffset;
+				newPosition.y += yOffset * i;
+				mDraggedCards[i]->setPosition(newPosition);
+			}
+		}
 	}
 }
 
@@ -168,9 +204,19 @@ void GameManager::render()
 		mFoundations[i].render(mWindowRef);
 	}
 
-	if (mDraggedCard && mIsCardBeingDragged)
+	if (mIsCardBeingDragged)
 	{
-		mDraggedCard->render(mWindowRef);
+		if (mDraggedCard)
+		{
+			mDraggedCard->render(mWindowRef);
+		}
+		else
+		{
+			for (Card* card : mDraggedCards)
+			{
+				card->render(mWindowRef);
+			}
+		}
 	}
 }
 
@@ -206,21 +252,36 @@ void GameManager::beginGame()
 
 // -----------------------------------------------------------------------------
 
-Card* GameManager::getCardAtMousePosition()
+std::vector<Card*> GameManager::getCardsAtMousePosition(const sf::Vector2i& pMousePosition)
 {
-	// this will be the top card of any pile for the moment
 	Card* card = nullptr;
+	std::vector<Card*> cards;
 
 	// get the mouse position
-	const sf::Vector2f mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(mWindowRef));
+	const sf::Vector2f mousePosition = static_cast<sf::Vector2f>(pMousePosition);
 
 	// check the tableau piles
 	for (uint32_t i = 0; i < mTableaus.size(); ++i)
 	{
-		if (mTableaus[i].isMouseOverTopCard(mousePosition))
+		if (mTableaus[i].isMouseOverCard(mousePosition, card))
 		{
-			card = mTableaus[i].peek();
-			break;
+			if (card)
+			{
+				// is it a valid card to be dragged?
+				if (card->isFaceUp())
+				{
+					mDraggedCardOffset = card->getSprite().getPosition() - static_cast<sf::Vector2f>(mousePosition);
+
+					// check if it's a sequence, if it is, it will populate the cards
+					if (!mTableaus[i].isValidSequence(card, cards))
+					{
+						cards.push_back(card);
+						return cards;
+					}
+				}
+			}
+
+			return cards;
 		}
 	}
 
@@ -230,17 +291,19 @@ Card* GameManager::getCardAtMousePosition()
 		if (mFoundations[i].isMouseOverTopCard(mousePosition))
 		{
 			card = mFoundations[i].peek();
-			break;
+			cards.push_back(card);
+			return cards;
 		}
 	}
 
 	// check the waste pile
-	if (mDeck.isMouseOverWaste(sf::Mouse::getPosition(mWindowRef)))
+	if (mDeck.isMouseOverWaste(pMousePosition))
 	{
 		card = mDeck.peekWaste();
+		cards.push_back(card);
 	}
 
-	return card;
+	return cards;
 }
 
 // -----------------------------------------------------------------------------
@@ -328,6 +391,26 @@ void GameManager::resetDraggedCardPosition()
 {
 	// reset the position of the card being dragged
 	mDraggedCard->setPosition(mDraggedCardOriginalPosition);
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::resetDraggedCardsPosition()
+{
+	for(uint32_t i = 0; i < mDraggedCards.size(); ++i)
+	{
+		mDraggedCards[i]->setPosition(mDraggedCardsOriginalPositions[i]);
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::setDraggedCardsOriginalPositions()
+{
+	for (Card* card : mDraggedCards)
+	{
+		mDraggedCardsOriginalPositions.push_back(card->getSprite().getPosition());
+	}
 }
 
 // -----------------------------------------------------------------------------

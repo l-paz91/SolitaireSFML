@@ -54,6 +54,9 @@ public:
 	// is mouse over top card in pile
 	virtual bool isMouseOverTopCard(const sf::Vector2f& pMousePos);
 
+	// is mouse over card in pile
+	virtual bool isMouseOverCard(const sf::Vector2f& pMousePos, Card*& pOutSelectedCard);
+
 	// is card in pile
 	bool isCardInPile(Card* pCard);
 

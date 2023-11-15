@@ -55,6 +55,7 @@ public:
 	// ~Pile Interface
 
 	bool isValidMove(std::vector<Card*>& pCards);
+	bool isValidSequence(Card* pCard, std::vector<Card*>& pOutCardSequence);
 
 	// debug print to console
 	void printToConsole();
@@ -67,6 +68,7 @@ public:
 private:
 	bool isCardValid(Card* pCard, Card* pCardAbove);
 	bool areCardsValid(std::vector<Card*>& pCards);
+	int getCardIndex(Card* pCard);
 
 	sf::Sprite mBlankSpace;
 };

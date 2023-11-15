@@ -93,6 +93,30 @@ bool Pile::isMouseOverTopCard(const sf::Vector2f& pMousePos)
 
 // -----------------------------------------------------------------------------
 
+bool Pile::isMouseOverCard(const sf::Vector2f& pMousePos, Card*& pOutSelectedCard)
+{
+	if (mCards.empty())
+	{
+		return false;
+	}
+
+	// Iterate in reverse order so that we're not returning cards that have other 
+	// cards drawn on top of them
+	for (auto it = mCards.rbegin(); it != mCards.rend(); ++it)
+	{
+		Card* card = *it;
+		if (card->getSprite().getGlobalBounds().contains(pMousePos))
+		{
+			pOutSelectedCard = card;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// -----------------------------------------------------------------------------
+
 bool Pile::isCardInPile(Card* pCard)
 {
 	for (Card* card : mCards)
