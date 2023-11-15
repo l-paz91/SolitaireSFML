@@ -39,6 +39,7 @@ private:
 
 	void updateDraggedCardPosition(const sf::Vector2f& pNewPosition);
 	void resetDraggedCardPosition();
+	void handleCardDrop();
 
 	sf::Sprite mCardBackSprite;
 	sf::RectangleShape mBlankSpace;

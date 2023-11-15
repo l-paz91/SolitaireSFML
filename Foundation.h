@@ -6,7 +6,7 @@
 //--INCLUDES--//
 #include "Pile.h"
 
-#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -39,6 +39,10 @@ public:
 	// Foundation destructor
 	~Foundation();
 
+	// Begin Pile Interface
+	virtual bool isMouseOverTopCard(const sf::Vector2f& pMousePos);
+	// ~Pile Interface
+
 	// checks if a card can be moved to the foundation
 	virtual bool isValidMove(Card* pCard) override;
 
@@ -51,7 +55,7 @@ public:
 	void setPosition(const sf::Vector2f& pPosition) { mBlankSpace.setPosition(pPosition); }
 
 private:
-	sf::RectangleShape mBlankSpace;
+	sf::Sprite mBlankSpace;
 };
 
 // -----------------------------------------------------------------------------

@@ -18,7 +18,7 @@ GameManager::GameManager(sf::RenderWindow& pWindow)
 
 	// set up the blank space
 	mBlankSpace.setSize(sf::Vector2f(mCardBackSprite.getGlobalBounds().width, mCardBackSprite.getGlobalBounds().height));
-	mBlankSpace.setFillColor(sf::Color(27, 18, 18));
+	mBlankSpace.setFillColor(sf::Color(27, 18, 18, 100));
 	mBlankSpace.setPosition(20.f, 20.f);
 
 	// set up the tableau piles
@@ -70,9 +70,9 @@ void GameManager::processEvents(const sf::Event& pEvent)
 	// LMB pressed
 	if (pEvent.type == Event::MouseButtonPressed && pEvent.mouseButton.button == Mouse::Left)
 	{
-		if (Card* selectedCard = getCardAtMousePosition())
+		if (!mIsCardBeingDragged)
 		{
-			if (!mIsCardBeingDragged)
+			if (Card* selectedCard = getCardAtMousePosition())
 			{
 				// start dragging the card
 				mIsCardBeingDragged = true;
@@ -102,7 +102,7 @@ void GameManager::processEvents(const sf::Event& pEvent)
 		}
 
 		// are dragging a card and releasing it?
-		if (mIsCardBeingDragged)
+		if (mIsCardBeingDragged && mDraggedCard)
 		{
 			Pile* targetPile = getPileAtMousePosition();
 			if (targetPile && targetPile->isValidMove(mDraggedCard))
@@ -112,9 +112,12 @@ void GameManager::processEvents(const sf::Event& pEvent)
 				mDraggedCardOriginalPile->pop();
 
 				// flip the top card of the original pile
-				if (mDraggedCardOriginalPile->peek())
+				if (Card* peekedCard = mDraggedCardOriginalPile->peek())
 				{	
-					mDraggedCardOriginalPile->peek()->flip();
+					if (!peekedCard->isFaceUp())
+					{
+						peekedCard->flip();
+					}
 				}
 			}
 			else
@@ -284,10 +287,14 @@ Pile* GameManager::getPileAtMousePosition()
 	// check the tableau piles
 	for (uint32_t i = 0; i < mTableaus.size(); ++i)
 	{
-		if (mTableaus[i].isMouseOverTopCard(mousePosition))
+		// we don't want to check the original pile (which our card is currently at the mouse position of)
+		if (&mTableaus[i] != mDraggedCardOriginalPile)
 		{
-			pile = &mTableaus[i];
-			break;
+			if (mTableaus[i].isMouseOverTopCard(mousePosition))
+			{
+				pile = &mTableaus[i];
+				return pile;
+			}
 		}
 	}
 
@@ -297,7 +304,7 @@ Pile* GameManager::getPileAtMousePosition()
 		if (mFoundations[i].isMouseOverTopCard(mousePosition))
 		{
 			pile = &mFoundations[i];
-			break;
+			return pile;
 		}
 	}
 

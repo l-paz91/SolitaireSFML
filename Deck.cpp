@@ -44,7 +44,7 @@ Deck::Deck()
 	}
 
 	// shuffle the deck
-	//mStock.shuffle();
+	mStock.shuffle();
 
 	printStockToConsole();
 }

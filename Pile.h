@@ -28,7 +28,7 @@ public:
 	~Pile();
 
 	// add a card to the top of the pile
-	void push(Card* pCard);
+	virtual void push(Card* pCard);
 
 	// removes the top card from the pile
 	Card* pop();
@@ -52,7 +52,7 @@ public:
 	void printToConsole();
 
 	// is mouse over top card in pile
-	bool isMouseOverTopCard(const sf::Vector2f& pMousePos);
+	virtual bool isMouseOverTopCard(const sf::Vector2f& pMousePos);
 
 	// is card in pile
 	bool isCardInPile(Card* pCard);

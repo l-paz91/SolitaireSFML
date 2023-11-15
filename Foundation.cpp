@@ -12,10 +12,9 @@
 Foundation::Foundation(const sf::Vector2f& pPosition)
 	: Pile(pPosition)
 {
-	mBlankSpace.setTexture(&TextureManager::getTexture("Graphics/BackDesign.png"));
-	mBlankSpace.setSize(static_cast<sf::Vector2f>(mBlankSpace.getTexture()->getSize()));
+	mBlankSpace.setTexture(TextureManager::getTexture("Graphics/BackDesign.png"));
 	mBlankSpace.setScale(0.2f, 0.2f);
-	mBlankSpace.setFillColor(sf::Color(27, 18, 18));
+	mBlankSpace.setColor(sf::Color(27, 18, 18, 100));
 	setPosition(pPosition);
 }
 
@@ -24,6 +23,20 @@ Foundation::Foundation(const sf::Vector2f& pPosition)
 Foundation::~Foundation()
 {
 
+}
+
+// -----------------------------------------------------------------------------
+
+bool Foundation::isMouseOverTopCard(const sf::Vector2f& pMousePos)
+{
+	if (mBlankSpace.getGlobalBounds().contains(pMousePos))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -67,6 +80,11 @@ void Foundation::printToConsole()
 void Foundation::render(sf::RenderWindow& pWindow)
 {
 	pWindow.draw(mBlankSpace);
+
+	if (!getCards().empty())
+	{
+		getCards().back()->render(pWindow);		
+	}
 }
 
 // -----------------------------------------------------------------------------

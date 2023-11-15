@@ -4,14 +4,26 @@
 #include "Tableau.h"
 
 #include "Card.h"
+#include "TextureManager.h"
 
 #include <iostream>
+
+// -----------------------------------------------------------------------------
+
+namespace TableauPrivate
+{
+	constexpr float Y_OFFSET = 30.f;
+}
 
 // -----------------------------------------------------------------------------
 
 Tableau::Tableau(const sf::Vector2f& pPosition)
 	: Pile(pPosition)
 {
+	mBlankSpace.setTexture(TextureManager::getTexture("Graphics/BackDesign.png"));
+	mBlankSpace.setScale(0.2f, 0.2f);
+	mBlankSpace.setColor(sf::Color(27, 18, 18, 100));
+	setPosition(pPosition);
 }
 
 // -----------------------------------------------------------------------------
@@ -80,6 +92,43 @@ bool Tableau::isValidMove(std::vector<Card*>& pCards)
 
 // -----------------------------------------------------------------------------
 
+void Tableau::push(Card* pCard)
+{
+	if (getCards().empty())
+	{
+		Pile::push(pCard);
+		return;
+	}
+
+	// get the position of the top card
+	Card* topCard = peek();
+	if (topCard)
+	{
+		const sf::Vector2f topPos = peek()->getSprite().getPosition();
+
+		pCard->getSprite().setPosition(sf::Vector2f(topPos.x, topPos.y + TableauPrivate::Y_OFFSET));
+		getCards().push_back(pCard);
+	}	
+}
+
+// -----------------------------------------------------------------------------
+
+bool Tableau::isMouseOverTopCard(const sf::Vector2f& pMousePos)
+{
+	if (!isEmpty())
+	{
+		return Pile::isMouseOverTopCard(pMousePos);
+	}
+	else if(mBlankSpace.getGlobalBounds().contains(pMousePos))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+// -----------------------------------------------------------------------------
+
 void Tableau::printToConsole()
 {
 	std::cout << "Tableau: ";
@@ -97,6 +146,10 @@ void Tableau::render(sf::RenderWindow& pWindow)
 			getCards()[i]->render(pWindow);
 		}
 	}
+	else
+	{
+		pWindow.draw(mBlankSpace);
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -108,6 +161,10 @@ void Tableau::setStartingPositions()
 
 	for (uint32_t i = 0; i < getCards().size(); ++i)
 	{
+		if (i == 0)
+		{
+			mBlankSpace.setPosition(sf::Vector2f(getPosition().x, startY + offset * i));
+		}
 		getCards()[i]->setPosition(sf::Vector2f(getPosition().x, startY + offset * i));
 	}
 }

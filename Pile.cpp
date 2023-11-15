@@ -50,6 +50,11 @@ Card* Pile::pop()
 
 Card* Pile::peek()
 {
+	if (mCards.empty())
+	{
+		return nullptr;
+	}
+
 	return mCards.back();
 }
 

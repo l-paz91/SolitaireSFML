@@ -47,7 +47,13 @@ public:
 	~Tableau();
 
 	// checks if a card can be moved to the tableau
+
+	// Begin Pile Interface
 	virtual bool isValidMove(Card* pCard) override;
+	virtual void push(Card* pCard) override;
+	virtual bool isMouseOverTopCard(const sf::Vector2f& pMousePos);
+	// ~Pile Interface
+
 	bool isValidMove(std::vector<Card*>& pCards);
 
 	// debug print to console
@@ -61,6 +67,8 @@ public:
 private:
 	bool isCardValid(Card* pCard, Card* pCardAbove);
 	bool areCardsValid(std::vector<Card*>& pCards);
+
+	sf::Sprite mBlankSpace;
 };
 
 // -----------------------------------------------------------------------------

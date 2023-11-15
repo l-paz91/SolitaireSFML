@@ -55,6 +55,7 @@ public:
 
 	bool isRed() const { return mSuit == eHEARTS || mSuit == eDIAMONDS; }
 	bool isBlack() const { return mSuit == eCLUBS || mSuit == eSPADES; }
+	bool isFaceUp() const { return mFaceUp; }
 
 	void setPosition(const sf::Vector2f& pPosition) { mSprite.setPosition(pPosition); }
 
