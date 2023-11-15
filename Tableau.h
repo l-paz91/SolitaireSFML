@@ -50,11 +50,11 @@ public:
 
 	// Begin Pile Interface
 	virtual bool isValidMove(Card* pCard) override;
+	virtual bool isValidMove(std::vector<Card*>& pCards) override;
 	virtual void push(Card* pCard) override;
 	virtual bool isMouseOverTopCard(const sf::Vector2f& pMousePos);
 	// ~Pile Interface
 
-	bool isValidMove(std::vector<Card*>& pCards);
 	bool isValidSequence(Card* pCard, std::vector<Card*>& pOutCardSequence);
 
 	// debug print to console

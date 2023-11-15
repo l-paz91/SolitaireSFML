@@ -142,7 +142,30 @@ void GameManager::processEvents(const sf::Event& pEvent)
 			}
 			else
 			{
-				resetDraggedCardsPosition();
+				Pile* targetPile = getPileAtMousePosition();
+				if (targetPile && targetPile->isValidMove(mDraggedCards))
+				{
+					// move the cards to the target pile in the correct order
+					for (Card* card : mDraggedCards)
+					{
+						targetPile->push(card);
+						mDraggedCardOriginalPile->pop();
+					}
+
+					// flip the top card of the original pile
+					if (Card* peekedCard = mDraggedCardOriginalPile->peek())
+					{
+						if (!peekedCard->isFaceUp())
+						{
+							peekedCard->flip();
+						}
+					}
+				}
+				else
+				{
+					resetDraggedCardsPosition();
+				}
+
 				mDraggedCards.clear();
 				mDraggedCardsOriginalPositions.clear();
 			}

@@ -61,6 +61,7 @@ public:
 	bool isCardInPile(Card* pCard);
 
 	virtual bool isValidMove(Card* pCard) { return false; };
+	virtual bool isValidMove(std::vector<Card*>& pCards);
 
 private:
 	std::vector<Card*> mCards;
