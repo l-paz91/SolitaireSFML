@@ -8,6 +8,7 @@
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <iostream>
 
 // -----------------------------------------------------------------------------
 
@@ -42,6 +43,7 @@ public:
 
 	// Begin Pile Interface
 	virtual bool isMouseOverTopCard(const sf::Vector2f& pMousePos);
+	virtual void printName() override { std::cout << "Foundation" << std::endl; }
 	// ~Pile Interface
 
 	// checks if a card can be moved to the foundation

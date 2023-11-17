@@ -9,6 +9,7 @@
 #include <vector>
 #include <SFML/Window/Event.hpp>
 #include <SFML/System/Time.hpp>
+#include <iostream>
 
 // -----------------------------------------------------------------------------
 
@@ -62,6 +63,9 @@ public:
 
 	virtual bool isValidMove(Card* pCard) { return false; };
 	virtual bool isValidMove(std::vector<Card*>& pCards);
+
+	virtual void printName() { std::cout << "Pile" << std::endl;}
+	virtual int getID() { return -1; }
 
 private:
 	std::vector<Card*> mCards;

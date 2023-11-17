@@ -78,6 +78,12 @@ void GameManager::processEvents(const sf::Event& pEvent)
 
 	// process card events
 
+	// ctrl+z pressed
+	if (pEvent.type == Event::KeyPressed && pEvent.key.code == Keyboard::Z && Keyboard::isKeyPressed(Keyboard::LControl))
+	{
+		undoMove();
+	}
+
 	// LMB pressed
 	if (pEvent.type == Event::MouseButtonPressed && pEvent.mouseButton.button == Mouse::Left)
 	{
@@ -120,6 +126,11 @@ void GameManager::processEvents(const sf::Event& pEvent)
 		if (mDeck.isMouseOverStock(mousePosition) && !mIsCardBeingDragged)
 		{
 			mDeck.draw();
+
+			// create move history for undo command
+			Undo move(EMoveType::eDRAW, mDeck.peekWaste(), &mDeck.getStock(), &mDeck.getWaste());
+			mMoveHistory.push_back(move);
+			debugPrintMoveHistory();
 		}
 
 		// are dragging a card and releasing it?
@@ -142,6 +153,11 @@ void GameManager::processEvents(const sf::Event& pEvent)
 							peekedCard->flip();
 						}
 					}
+
+					// create move history for undo command
+					Undo move(EMoveType::eTRANSFER, mDraggedCard, mDraggedCardOriginalPile, targetPile);
+					mMoveHistory.push_back(move);
+					debugPrintMoveHistory();
 				}
 				else
 				{
@@ -171,6 +187,11 @@ void GameManager::processEvents(const sf::Event& pEvent)
 							peekedCard->flip();
 						}
 					}
+
+					// create move history for undo command
+					Undo move(EMoveType::eTRANSFER, mDraggedCards, mDraggedCardOriginalPile, targetPile);
+					mMoveHistory.push_back(move);
+					debugPrintMoveHistory();
 				}
 				else
 				{
@@ -322,10 +343,10 @@ void GameManager::beginGame()
 		}
 
 		// print the tableau piles
-		for (int i = 0; i < 7; ++i)
-		{
-			mTableaus[i].printToConsole();
-		}
+		//for (int i = 0; i < 7; ++i)
+		//{
+		//	mTableaus[i].printToConsole();
+		//}
 	}
 }
 
@@ -429,6 +450,75 @@ float GameManager::getCardXVelocity()
 float GameManager::getCardYVelocity()
 {
 	return static_cast<float>(GameFacilities::randint(-15, -7));
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::debugPrintMoveHistory()
+{
+	// print the last move added to the vector
+	if (mMoveHistory.size() > 0)
+	{
+		mMoveHistory.back().debugPrint();
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::undoMove()
+{
+	if (mMoveHistory.empty())
+	{
+		return;
+	}
+
+	Undo lastMove = mMoveHistory.back();
+	mMoveHistory.pop_back();
+
+	switch (lastMove.mMoveType)
+	{
+		case EMoveType::eDRAW:
+		{
+			// undo drawing a card
+			lastMove.mCards.back()->flip();
+			lastMove.mFromPile->push(lastMove.mCards.back());
+			lastMove.mToPile->pop();
+			break;
+		}
+		case EMoveType::eTRANSFER:
+		{
+			// flip the top card of the original pile only if it came from a tableau pile
+			if (lastMove.mFromPile->getID() == 1)
+			{
+				if (Card* peekedCard = lastMove.mFromPile->peek())
+				{
+					if (peekedCard->isFaceUp())
+					{
+						peekedCard->flip();
+					}
+				}
+			}
+
+			// undo transferring cards
+			if (lastMove.mCards.size() == 1)
+			{
+				lastMove.mFromPile->push(lastMove.mCards.back());
+				lastMove.mToPile->pop();
+			}
+			else
+			{
+				for (Card* card : lastMove.mCards)
+				{
+					lastMove.mFromPile->push(card);
+					lastMove.mToPile->pop();
+				}
+			}
+
+			break;
+		}
+		default:
+			break;
+	}
 }
 
 // -----------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 #include "Deck.h"
 #include "Foundation.h"
 #include "Tableau.h"
+#include "UndoCommand.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -71,6 +72,9 @@ private:
 	float getCardXVelocity();
 	float getCardYVelocity();
 
+	void debugPrintMoveHistory();
+	void undoMove();
+
 	std::vector<Card*> getCardsAtMousePosition(const sf::Vector2i& pMousePosition);
 
 	Pile* findPileContainingCard(Card* pSelectedCard);
@@ -98,6 +102,8 @@ private:
 	Pile* mDraggedCardOriginalPile;
 	sf::Vector2f mDraggedCardOriginalPosition;
 	sf::Vector2f mDraggedCardOffset;
+
+	std::vector<Undo> mMoveHistory;
 
 	AnimatedCard mAnimatedCard;
 	bool mIsCardBeingDragged;

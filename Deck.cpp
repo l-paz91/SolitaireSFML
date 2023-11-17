@@ -46,7 +46,7 @@ Deck::Deck()
 	// shuffle the deck
 	mStock.shuffle();
 
-	printStockToConsole();
+	//printStockToConsole();
 }
 
 // -----------------------------------------------------------------------------
@@ -121,8 +121,8 @@ void Deck::draw()
 	mWaste.peek()->flip();
 
 	// print the deck of cards
-	printStockToConsole();
-	printWasteToConsole();
+	//printStockToConsole();
+	//printWasteToConsole();
 }
 
 // -----------------------------------------------------------------------------
@@ -138,8 +138,8 @@ void Deck::reset()
 	}
 
 	// print the deck of cards
-	printStockToConsole();
-	printWasteToConsole();
+	//printStockToConsole();
+	//printWasteToConsole();
 }
 
 // -----------------------------------------------------------------------------
