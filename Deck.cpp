@@ -16,7 +16,7 @@ Deck::Deck()
 	{
 		const std::string filename = "Graphics/Hearts/" + std::to_string(rank) + ".png";
 
-		mStock.push(new Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(0), false, filename));
+		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eHEARTS, false, filename));
 	}
 
 	// diamond suit
@@ -24,7 +24,7 @@ Deck::Deck()
 	{
 		const std::string filename = "Graphics/Diamonds/" + std::to_string(rank) + ".png";
 
-		mStock.push(new Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(1), false, filename));
+		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eDIAMONDS, false, filename));
 	}
 
 	// club suit
@@ -32,7 +32,7 @@ Deck::Deck()
 	{
 		const std::string filename = "Graphics/Clubs/" + std::to_string(rank) + ".png";
 
-		mStock.push(new Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(2), false, filename));
+		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eCLUBS, false, filename));
 	}
 
 	// spade suit
@@ -40,7 +40,7 @@ Deck::Deck()
 	{
 		const std::string filename = "Graphics/Spades/" + std::to_string(rank) + ".png";
 
-		mStock.push(new Card(static_cast<ECardRank>(rank), static_cast<ECardSuit>(3), false, filename));
+		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eSPADES, false, filename));
 	}
 
 	// shuffle the deck

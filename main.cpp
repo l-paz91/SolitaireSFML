@@ -92,7 +92,6 @@ int main()
 
 			// draw the previous buffer with transparency
 			prevWinScreenSprite.setTexture(prevWinScreenBuffer->getTexture());
-			//Sprite prevWinScreenSprite(prevWinScreenBuffer->getTexture());
 			prevWinScreenSprite.setColor(Color(255, 255, 255, 255));
 			currentWinScreenBuffer->draw(prevWinScreenSprite);
 
