@@ -88,5 +88,17 @@ void Foundation::render(sf::RenderWindow& pWindow)
 }
 
 // -----------------------------------------------------------------------------
+
+void Foundation::render(sf::RenderTexture& pRenderTexture)
+{
+	pRenderTexture.draw(mBlankSpace);
+
+	if (!getCards().empty())
+	{
+		pRenderTexture.draw(getCards().back()->getSprite());
+	}
+}
+
+// -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------
 // -----------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #include "Pile.h"
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -51,6 +52,7 @@ public:
 
 	// core functions
 	void render(sf::RenderWindow& pWindow);
+	void render(sf::RenderTexture& pRenderTexture);
 
 	void setPosition(const sf::Vector2f& pPosition) { mBlankSpace.setPosition(pPosition); }
 

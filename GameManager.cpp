@@ -2,9 +2,17 @@
 
 //--INCLUDES--//
 #include "GameManager.h"
+#include "GameFacilities.h"
 #include "TextureManager.h"
 
 #include <SFML/Window/Event.hpp>
+
+// -----------------------------------------------------------------------------
+
+namespace GameManagerPrivate
+{
+	const float TIME_PER_CARD = 5.0f;
+}
 
 // -----------------------------------------------------------------------------
 
@@ -42,6 +50,8 @@ GameManager::GameManager(sf::RenderWindow& pWindow)
 		float foundationX = foundationStart + (foundationWidth * i);
 		mFoundations.push_back(Foundation(sf::Vector2f(foundationX, foundationHeight)));
 	}
+
+	mGameState = EGameState::ePLAYING;
 }
 
 // -----------------------------------------------------------------------------
@@ -55,7 +65,8 @@ GameManager::~GameManager()
 
 void GameManager::init()
 {
-	beginGame();
+	//beginGame();
+	debugWinGame();
 }
 
 // -----------------------------------------------------------------------------
@@ -181,28 +192,55 @@ void GameManager::update(sf::Time& pDeltaTime)
 {
 	const float deltaTimeSeconds = pDeltaTime.asSeconds();
 
-	if (mIsCardBeingDragged)
+	if (mGameState == ePLAYING)
 	{
-		// get the mouse position
-		const sf::Vector2f mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(mWindowRef));
-		sf::Vector2f newPosition = mousePosition + mDraggedCardOffset;
-
-		if (mDraggedCard)
+		if (mIsCardBeingDragged)
 		{
+			// get the mouse position
+			const sf::Vector2f mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(mWindowRef));
 			sf::Vector2f newPosition = mousePosition + mDraggedCardOffset;
-			updateDraggedCardPosition(newPosition);
-		}
-		else
-		{
-			const float yOffset = 30.f;
-			// we're dragging multiple cards
-			for (uint32_t i = 0; i < mDraggedCards.size(); ++i)
+
+			if (mDraggedCard)
 			{
 				sf::Vector2f newPosition = mousePosition + mDraggedCardOffset;
-				newPosition.y += yOffset * i;
-				mDraggedCards[i]->setPosition(newPosition);
+				updateDraggedCardPosition(newPosition);
+			}
+			else
+			{
+				const float yOffset = 30.f;
+				// we're dragging multiple cards
+				for (uint32_t i = 0; i < mDraggedCards.size(); ++i)
+				{
+					sf::Vector2f newPosition = mousePosition + mDraggedCardOffset;
+					newPosition.y += yOffset * i;
+					mDraggedCards[i]->setPosition(newPosition);
+				}
 			}
 		}
+
+		// check if the game has been won
+		if (gameWon())
+		{
+			mGameState = EGameState::eWON;
+			mAnimatedCard.mCard = mFoundations[0].peek();
+
+			float xVel = getCardXVelocity();
+			float yVel = getCardYVelocity();
+
+			mAnimatedCard.mVelocity = sf::Vector2f(xVel, yVel);
+			mAnimatedCard.mFoundationPileIndex = 0;
+			mAnimatedCard.mFoundationCardIndex = 12;
+			mAnimatedCard.mAnimationTime = 0.f;
+			mAnimatedCard.mGravity = 2.f;
+			mAnimatedCard.mEnergyLoss = 0.8f;
+			mAnimatedCard.mInitialVerticalVelocity = yVel;
+
+			mWindowRef.setFramerateLimit(30);
+		}
+	}
+	else if (mGameState == eWON)
+	{
+		winAnimation(pDeltaTime);
 	}
 }
 
@@ -215,10 +253,9 @@ void GameManager::render()
 	// render the deck pile (stock and waste)
 	mDeck.render(mWindowRef);
 
-	// render the tableau piles
-	for (uint32_t i = 0; i < mTableaus.size(); ++i)
+	if (mGameState == EGameState::eWON)
 	{
-		mTableaus[i].render(mWindowRef);
+		mAnimatedCard.mCard->render(mWindowRef);
 	}
 
 	// render the foundation piles
@@ -227,17 +264,26 @@ void GameManager::render()
 		mFoundations[i].render(mWindowRef);
 	}
 
-	if (mIsCardBeingDragged)
+	if (mGameState == ePLAYING)
 	{
-		if (mDraggedCard)
+		// render the tableau piles
+		for (uint32_t i = 0; i < mTableaus.size(); ++i)
 		{
-			mDraggedCard->render(mWindowRef);
+			mTableaus[i].render(mWindowRef);
 		}
-		else
+
+		if (mIsCardBeingDragged)
 		{
-			for (Card* card : mDraggedCards)
+			if (mDraggedCard)
 			{
-				card->render(mWindowRef);
+				mDraggedCard->render(mWindowRef);
+			}
+			else
+			{
+				for (Card* card : mDraggedCards)
+				{
+					card->render(mWindowRef);
+				}
 			}
 		}
 	}
@@ -245,32 +291,144 @@ void GameManager::render()
 
 // -----------------------------------------------------------------------------
 
+void GameManager::renderWinAnimation(sf::RenderTexture& mRenderTexture)
+{
+	mRenderTexture.draw(mAnimatedCard.mCard->getSprite());
+}
+
+// -----------------------------------------------------------------------------
+
 void GameManager::beginGame()
 {
-	// deal cards to tableau piles from the deck
-	for (int i = 0; i < 7; ++i)
+	if (mGameState == ePLAYING)
 	{
-		for (int j = 0; j < i + 1; ++j)
+		// deal cards to tableau piles from the deck
+		for (int i = 0; i < 7; ++i)
 		{
-			// deal cards from the deck to the tableau piles
-			mTableaus[i].push(mDeck.peekStock());
-			mDeck.popStock();
+			for (int j = 0; j < i + 1; ++j)
+			{
+				// deal cards from the deck to the tableau piles
+				mTableaus[i].push(mDeck.peekStock());
+				mDeck.popStock();
+			}
+
+			mTableaus[i].setStartingPositions();
 		}
 
-		mTableaus[i].setStartingPositions();
+		// flip the top card of each tableau pile
+		for (int i = 0; i < 7; ++i)
+		{
+			mTableaus[i].peek()->flip();
+		}
+
+		// print the tableau piles
+		for (int i = 0; i < 7; ++i)
+		{
+			mTableaus[i].printToConsole();
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::debugWinGame()
+{
+	// deal the cards out so that one move results in a win
+	if (mGameState == ePLAYING)
+	{
+		// deal cards to tableau piles from the deck
+		for (int i = 0; i < 4; ++i)
+		{
+			for (int j = 0; j < 13; ++j)
+			{
+				if (i == 3 && j == 12)
+				{
+					break;
+				}
+				// deal cards from the deck to the foundation piles
+				Card* card = mDeck.peekStock();
+				card->flip();
+				mFoundations[i].push(mDeck.peekStock());
+				mDeck.popStock();
+			}
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::winAnimation(sf::Time& pDeltaTime)
+{
+	const float deltaTimeSeconds = pDeltaTime.asSeconds();
+
+	// play bouncing card animation with foundation piles
+	mAnimatedCard.mAnimationTime += deltaTimeSeconds;
+
+	// check if it's time to go to the next card
+	sf::Vector2f cardPos = mAnimatedCard.mCard->getSprite().getPosition();
+	sf::FloatRect cardRect = mAnimatedCard.mCard->getSprite().getGlobalBounds();
+
+	const int windowMaxX = mWindowRef.getSize().x;
+
+	if (cardPos.x > windowMaxX || cardPos.x < 0-cardRect.width)
+	{
+		float xVel = getCardXVelocity();
+		float yVel = getCardYVelocity();
+		mAnimatedCard.reset(xVel, yVel);
+
+		++mAnimatedCard.mFoundationPileIndex;
+		if (mAnimatedCard.mFoundationPileIndex >= 4)
+		{
+			mAnimatedCard.mFoundationPileIndex = 0;
+			--mAnimatedCard.mFoundationCardIndex;
+
+			if (mAnimatedCard.mFoundationCardIndex < 0)
+			{
+				mGameState = EGameState::eEND;
+			}
+		}
+
+		if (mAnimatedCard.mFoundationCardIndex)
+		{
+			mAnimatedCard.mCard = mFoundations[mAnimatedCard.mFoundationPileIndex].getCards()[mAnimatedCard.mFoundationCardIndex];
+		}
+		else
+		{
+			mGameState = EGameState::eEND;
+		}
 	}
 
-	// flip the top card of each tableau pile
-	for (int i = 0; i < 7; ++i)
-	{
-		mTableaus[i].peek()->flip();
-	}
+	mAnimatedCard.mVelocity.y += mAnimatedCard.mGravity;
+	mAnimatedCard.mCard->getSprite().move(mAnimatedCard.mVelocity);
 
-	// print the tableau piles
-	for (int i = 0; i < 7; ++i)
+	// Bounce if hitting the bottom of the window
+	cardPos = mAnimatedCard.mCard->getSprite().getPosition();
+	cardRect = mAnimatedCard.mCard->getSprite().getGlobalBounds();
+
+	if (cardPos.y + cardRect.height >= mWindowRef.getSize().y) 
 	{
-		mTableaus[i].printToConsole();
+		mAnimatedCard.mCard->getSprite().setPosition(cardPos.x, mWindowRef.getSize().y - cardRect.height);
+		mAnimatedCard.mVelocity.y *= -mAnimatedCard.mEnergyLoss; // Invert and reduce vertical velocity
+		mAnimatedCard.mVelocity.x *= 1.2f; // increase horizontal velocity
 	}
+}
+
+// -----------------------------------------------------------------------------
+
+float GameManager::getCardXVelocity()
+{
+	int left = GameFacilities::randint(-12, -5);
+	int right = GameFacilities::randint(5, 12);
+
+	int random = GameFacilities::randint(0, 1);
+	return static_cast<float>(random == 0 ? left : right);
+}
+
+// -----------------------------------------------------------------------------
+
+float GameManager::getCardYVelocity()
+{
+	return static_cast<float>(GameFacilities::randint(-15, -7));
 }
 
 // -----------------------------------------------------------------------------
@@ -434,6 +592,22 @@ void GameManager::setDraggedCardsOriginalPositions()
 	{
 		mDraggedCardsOriginalPositions.push_back(card->getSprite().getPosition());
 	}
+}
+
+// -----------------------------------------------------------------------------
+
+bool GameManager::gameWon()
+{
+	// if there are 13 cards in each of the 4 foundations, the game is won
+	for (uint32_t i = 0; i < mFoundations.size(); ++i)
+	{
+		if (mFoundations[i].getCards().size() != 13)
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 // -----------------------------------------------------------------------------

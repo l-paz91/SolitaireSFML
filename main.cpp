@@ -34,6 +34,19 @@ int main()
 	Sprite backgroundSprite;
 	backgroundSprite.setTexture(TextureManager::getTexture("Graphics/Background4.png"));
 
+	// create the render texture for the win screen
+	RenderTexture winScreenBufferA;
+	winScreenBufferA.create(GameFacilities::gWindowWidth, GameFacilities::gWindowHeight);
+
+	RenderTexture winScreenBufferB;
+	winScreenBufferB.create(GameFacilities::gWindowWidth, GameFacilities::gWindowHeight);
+
+	RenderTexture* currentWinScreenBuffer = &winScreenBufferA;
+	RenderTexture* prevWinScreenBuffer = &winScreenBufferB;
+
+	Sprite currentWinScreenSprite;
+	Sprite prevWinScreenSprite;
+
 	// Set up Game Manager
 	GameManager gameManager(mainWindow);
 	gameManager.init();
@@ -57,15 +70,49 @@ int main()
 			gameManager.processEvents(event);
 		}
 
-		// ---- CLEAR SCREEN ------------------------------------------------------- //
-		mainWindow.clear();
-
 		// ---- UPDATE ------------------------------------------------------------- //
 		gameManager.update(dt);
 
+		// ---- CLEAR SCREEN ------------------------------------------------------- //
+		if (gameManager.getGameState() == EGameState::ePLAYING)
+		{
+			mainWindow.clear();
+		}
+
 		// ---- RENDER ------------------------------------------------------------- //
-		mainWindow.draw(backgroundSprite);
-		gameManager.render();
+
+		if (gameManager.getGameState() == EGameState::ePLAYING)
+		{
+			mainWindow.draw(backgroundSprite);
+			gameManager.render();
+		}
+		else if (gameManager.getGameState() == EGameState::eWON)
+		{
+			currentWinScreenBuffer->clear(Color(0, 0, 0, 0));
+
+			// draw the previous buffer with transparency
+			prevWinScreenSprite.setTexture(prevWinScreenBuffer->getTexture());
+			//Sprite prevWinScreenSprite(prevWinScreenBuffer->getTexture());
+			prevWinScreenSprite.setColor(Color(255, 255, 255, 255));
+			currentWinScreenBuffer->draw(prevWinScreenSprite);
+
+			// render current game state onto the buffer
+			gameManager.renderWinAnimation(*currentWinScreenBuffer);
+
+			// complete the current frame
+			currentWinScreenBuffer->display();
+
+			// swap buffers
+			std::swap(currentWinScreenBuffer, prevWinScreenBuffer);
+
+			currentWinScreenSprite.setTexture(currentWinScreenBuffer->getTexture());
+			mainWindow.draw(currentWinScreenSprite);
+		}
+		else if(gameManager.getGameState() == EGameState::eEND)
+		{
+			mainWindow.draw(backgroundSprite);
+			gameManager.render();
+		}
 
 		// ---- DISPLAY WINDOW ----------------------------------------------------- //
 		mainWindow.display();

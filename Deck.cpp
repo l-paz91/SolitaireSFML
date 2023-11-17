@@ -12,7 +12,7 @@ Deck::Deck()
 {
 	// create a deck of cards
 	// heart suit
-	for (int rank = 1; rank < 14; rank++)
+	for (int rank = 13; rank > 0; --rank)
 	{
 		const std::string filename = "Graphics/Hearts/" + std::to_string(rank) + ".png";
 
@@ -20,7 +20,7 @@ Deck::Deck()
 	}
 
 	// diamond suit
-	for (int rank = 1; rank < 14; rank++)
+	for (int rank = 13; rank > 0; --rank)
 	{
 		const std::string filename = "Graphics/Diamonds/" + std::to_string(rank) + ".png";
 
@@ -28,7 +28,7 @@ Deck::Deck()
 	}
 
 	// club suit
-	for (int rank = 1; rank < 14; rank++)
+	for (int rank = 13; rank > 0; --rank)
 	{
 		const std::string filename = "Graphics/Clubs/" + std::to_string(rank) + ".png";
 
@@ -36,7 +36,7 @@ Deck::Deck()
 	}
 
 	// spade suit
-	for (int rank = 1; rank < 14; rank++)
+	for (int rank = 13; rank > 0; --rank)
 	{
 		const std::string filename = "Graphics/Spades/" + std::to_string(rank) + ".png";
 
@@ -44,7 +44,7 @@ Deck::Deck()
 	}
 
 	// shuffle the deck
-	mStock.shuffle();
+	//mStock.shuffle();
 
 	printStockToConsole();
 }

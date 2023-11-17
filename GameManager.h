@@ -13,7 +13,38 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Time.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <vector>
+
+// -----------------------------------------------------------------------------
+
+enum EGameState
+{
+	ePLAYING,
+	eWON,
+	eEND
+};
+
+// -----------------------------------------------------------------------------
+
+struct AnimatedCard
+{
+	Card* mCard;
+	sf::Vector2f mVelocity;
+	int mFoundationPileIndex;
+	int mFoundationCardIndex;
+	float mAnimationTime;
+	float mGravity;
+	float mEnergyLoss;
+	float mInitialVerticalVelocity;
+
+	void reset(float pXVel, float pYVel)
+	{
+		mVelocity = sf::Vector2f(pXVel, pYVel);
+		mAnimationTime = 0.f;
+		mInitialVerticalVelocity = pYVel;
+	}
+};
 
 // -----------------------------------------------------------------------------
 
@@ -28,10 +59,18 @@ public:
 	void processEvents(const sf::Event& pEvent);
 	void update(sf::Time& pDeltaTime);
 	void render();
+	void renderWinAnimation(sf::RenderTexture& mRenderTexture);
 
 	void beginGame();
 
+	EGameState getGameState() { return mGameState; }
+
 private:
+	void debugWinGame();
+	void winAnimation(sf::Time& pDeltaTime);
+	float getCardXVelocity();
+	float getCardYVelocity();
+
 	std::vector<Card*> getCardsAtMousePosition(const sf::Vector2i& pMousePosition);
 
 	Pile* findPileContainingCard(Card* pSelectedCard);
@@ -41,7 +80,8 @@ private:
 	void resetDraggedCardPosition();
 	void resetDraggedCardsPosition();
 	void setDraggedCardsOriginalPositions();
-	void setDraggedCardsMouseOffsets();
+
+	bool gameWon();
 
 	sf::Sprite mCardBackSprite;
 	sf::RectangleShape mBlankSpace;
@@ -59,7 +99,9 @@ private:
 	sf::Vector2f mDraggedCardOriginalPosition;
 	sf::Vector2f mDraggedCardOffset;
 
+	AnimatedCard mAnimatedCard;
 	bool mIsCardBeingDragged;
+	EGameState mGameState;
 };
 
 // -----------------------------------------------------------------------------
