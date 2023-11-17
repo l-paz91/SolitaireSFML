@@ -65,8 +65,8 @@ GameManager::~GameManager()
 
 void GameManager::init()
 {
-	//beginGame();
-	debugWinGame();
+	beginGame();
+	//debugWinGame();
 }
 
 // -----------------------------------------------------------------------------

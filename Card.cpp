@@ -10,7 +10,7 @@
 
 // -----------------------------------------------------------------------------
 
-Card::Card(ECardRank pRank, ECardSuit pSuit, bool pFaceUp, std::string pFilename)
+Card::Card(ECardRank pRank, ECardSuit pSuit, bool pFaceUp, const std::string& pFilename)
 	: mTextureFilename(pFilename)
 	, mRank(pRank)
 	, mSuit(pSuit)
@@ -20,7 +20,8 @@ Card::Card(ECardRank pRank, ECardSuit pSuit, bool pFaceUp, std::string pFilename
 	// set up card back sprite
 	if (!mFaceUp)
 	{
-		mSprite.setTexture(TextureManager::getTexture(GameFacilities::gCardBackFilename));
+		const std::string cardBackFilename = "Graphics/BackDesign.png";
+		mSprite.setTexture(TextureManager::getTexture(cardBackFilename));
 	}
 	else
 	{
@@ -59,7 +60,8 @@ void Card::flip()
 	}
 	else
 	{
-		mSprite.setTexture(TextureManager::getTexture(GameFacilities::gCardBackFilename));
+		const std::string cardBackFilename = "Graphics/BackDesign.png";
+		mSprite.setTexture(TextureManager::getTexture(cardBackFilename));
 	}
 }
 

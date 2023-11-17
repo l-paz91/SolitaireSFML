@@ -32,7 +32,7 @@ enum ECardSuit
 class Card
 {
 public:
-	Card(ECardRank pRank, ECardSuit pSuit, bool pFaceUp, std::string pFilename);
+	Card(ECardRank pRank, ECardSuit pSuit, bool pFaceUp, const std::string& pFilename);
 	~Card();
 
 	// core basics
