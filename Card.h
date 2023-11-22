@@ -25,7 +25,8 @@ enum ECardSuit
 	eHEARTS,
 	eDIAMONDS,
 	eCLUBS,
-	eSPADES
+	eSPADES,
+	eNONE
 };
 
 // -----------------------------------------------------------------------------

@@ -74,6 +74,7 @@ private:
 	// handle mouse events
 	void handleLeftMouseButtonPress(const sf::Vector2i& pMousePosition);
 	void handleLeftMouseButtonRelease(const sf::Vector2i& pMousePosition);
+	void handleRightMouseButtonRelease(const sf::Vector2i& pMousePosition);
 
 	float getCardXVelocity();
 	float getCardYVelocity();
@@ -85,6 +86,7 @@ private:
 
 	Pile* findPileContainingCard(Card* pSelectedCard);
 	Pile* getPileAtMousePosition();
+	Pile* getCorrectFoundationPile(Card* pSelectedCard);
 
 	void updateDraggedCardPosition(const sf::Vector2f& pNewPosition);
 	void resetDraggedCardPosition();

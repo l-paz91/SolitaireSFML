@@ -28,6 +28,7 @@ struct Undo
 		, mCards()
 		, mFromPile(nullptr)
 		, mToPile(nullptr)
+		, mOriginalFaceUpState(false)
 	{}
 
 	Undo(EMoveType pMoveType, const std::vector<Card*>& pCard, Pile* pFromPile, Pile* pToPile)
@@ -35,13 +36,16 @@ struct Undo
 		, mCards(pCard)
 		, mFromPile(pFromPile)
 		, mToPile(pToPile)
-	{}
+		, mOriginalFaceUpState(false)
+	{
+	}
 
 	Undo(EMoveType pMoveType, Card* pCard, Pile* pFromPile, Pile* pToPile)
 		: mMoveType(pMoveType)
 		, mCards()
 		, mFromPile(pFromPile)
 		, mToPile(pToPile)
+		, mOriginalFaceUpState(false)
 	{
 		mCards.push_back(pCard);
 	}
@@ -69,6 +73,7 @@ struct Undo
 	std::vector<Card*> mCards;	// the card(s) that moved
 	Pile* mFromPile;			// the pile the card was moved from
 	Pile* mToPile;				// the pile the card was moved to
+	bool mOriginalFaceUpState;	// the original face up state of the card below it
 };
 
 

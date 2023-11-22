@@ -95,6 +95,12 @@ void GameManager::processEvents(const sf::Event& pEvent)
 	{
 		handleLeftMouseButtonRelease(mousePosition);
 	}
+
+	// RMB released
+	if (pEvent.type == Event::MouseButtonReleased && pEvent.mouseButton.button == Mouse::Right)
+	{
+		handleRightMouseButtonRelease(mousePosition);
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -390,6 +396,9 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 				mDraggedCardOriginalPile->pop();
 			}
 
+			// create move history for undo command
+			Undo move(EMoveType::eTRANSFER, mDraggedCards, mDraggedCardOriginalPile, targetPile);
+
 			// flip the top card of the original pile
 			if (Card* peekedCard = mDraggedCardOriginalPile->peek())
 			{
@@ -397,10 +406,12 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 				{
 					peekedCard->flip();
 				}
+				else
+				{
+					move.mOriginalFaceUpState = true;
+				}
 			}
 
-			// create move history for undo command
-			Undo move(EMoveType::eTRANSFER, mDraggedCards, mDraggedCardOriginalPile, targetPile);
 			mMoveHistory.push_back(move);
 			debugPrintMoveHistory();
 		}
@@ -419,6 +430,54 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 		mDraggedCardsOriginalPositions.clear();
 
 		mIsCardBeingDragged = false;
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::handleRightMouseButtonRelease(const sf::Vector2i& pMousePosition)
+{
+	// on release, check if the mouse is over a single card
+	// if it is, check if it's a valid move to the foundation pile
+
+	std::vector<Card*> selectedCards = getCardsAtMousePosition(pMousePosition);
+	mDraggedCardOriginalPile = findPileContainingCard(selectedCards[0]);
+
+	if (selectedCards.size() == 1)
+	{
+		if (Pile* targetPile = getCorrectFoundationPile(selectedCards[0]))
+		{
+			// is it a valid move to the foundation pile?
+			if (targetPile->isValidMove(selectedCards[0]))
+			{
+				// move the card to the foundation pile
+				targetPile->push(selectedCards[0]);
+				mDraggedCardOriginalPile->pop();
+
+				// create move history for undo command
+				Undo move(EMoveType::eTRANSFER, selectedCards, mDraggedCardOriginalPile, targetPile);
+
+				// flip the top card of the original pile
+				if (Card* peekedCard = mDraggedCardOriginalPile->peek())
+				{
+					if (!peekedCard->isFaceUp())
+					{
+						peekedCard->flip();
+					}
+					else
+					{
+						move.mOriginalFaceUpState = true;
+					}
+				}
+
+				mMoveHistory.push_back(move);
+				debugPrintMoveHistory();
+			}
+			else
+			{
+				resetDraggedCardPosition();
+			}
+		}
 	}
 }
 
@@ -480,7 +539,7 @@ void GameManager::undoMove()
 			{
 				if (Card* peekedCard = lastMove.mFromPile->peek())
 				{
-					if (peekedCard->isFaceUp())
+					if (!lastMove.mOriginalFaceUpState)
 					{
 						peekedCard->flip();
 					}
@@ -633,6 +692,35 @@ Pile* GameManager::getPileAtMousePosition()
 	}
 
 	return pile;
+}
+
+// -----------------------------------------------------------------------------
+
+Pile* GameManager::getCorrectFoundationPile(Card* pSelectedCard)
+{
+	if (pSelectedCard->getRank() == ECardRank::eACE)
+	{
+		// is it an ace? if so, return the first empty foundation pile
+		for (Foundation& foundation : mFoundations)
+		{
+			if (foundation.isEmpty())
+			{
+				return &foundation;
+			}
+		}
+	}
+
+	ECardSuit selectedCardSuit = pSelectedCard->getSuit();
+
+	for (Foundation& foundation : mFoundations)
+	{
+		if (foundation.getSuit() == selectedCardSuit)
+		{
+			return &foundation;
+		}
+	}
+
+	return nullptr;
 }
 
 // -----------------------------------------------------------------------------

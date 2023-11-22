@@ -53,9 +53,9 @@ public:
 	virtual bool isValidMove(Card* pCard) override;
 	virtual bool isValidMove(std::vector<Card*>& pCards) override;
 	virtual void push(Card* pCard) override;
-	virtual bool isMouseOverTopCard(const sf::Vector2f& pMousePos);
-	virtual void printName() { std::cout << "Tableau" << std::endl; }
-	virtual int getID() { return 1; }	// disgusting, I'll change it eventually
+	virtual bool isMouseOverTopCard(const sf::Vector2f& pMousePos) override;
+	virtual void printName() override { std::cout << "Tableau" << std::endl; }
+	virtual int getID() override { return 1; }	// disgusting, I'll change it eventually
 	// ~Pile Interface
 
 	bool isValidSequence(Card* pCard, std::vector<Card*>& pOutCardSequence);

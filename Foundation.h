@@ -59,6 +59,8 @@ public:
 
 	void setPosition(const sf::Vector2f& pPosition) { mBlankSpace.setPosition(pPosition); }
 
+	ECardSuit getSuit();
+
 private:
 	sf::Sprite mBlankSpace;
 };
