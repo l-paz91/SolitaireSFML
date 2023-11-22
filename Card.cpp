@@ -32,6 +32,13 @@ Card::Card(ECardRank pRank, ECardSuit pSuit, bool pFaceUp, const std::string& pF
 	mSprite.setPosition(20.f, 20.f);
 
 	mPosition = mSprite.getPosition();
+
+	// set up the outline
+	mOutline.setSize(sf::Vector2f(mSprite.getGlobalBounds().width, mSprite.getGlobalBounds().height));
+	mOutline.setPosition(mSprite.getPosition());
+	mOutline.setFillColor(sf::Color::Yellow);
+	mOutline.setOutlineColor(sf::Color::Yellow);
+	mOutline.setOutlineThickness(2.f);
 }
 
 // -----------------------------------------------------------------------------
@@ -45,6 +52,11 @@ Card::~Card()
 
 void Card::render(sf::RenderWindow& pWindow)
 {
+	if (mSelected)
+	{
+		pWindow.draw(mOutline);
+	}
+
 	pWindow.draw(mSprite);
 }
 

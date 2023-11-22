@@ -6,6 +6,7 @@
 //--INCLUDES--//
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <string>
 
 // -----------------------------------------------------------------------------
@@ -59,8 +60,14 @@ public:
 
 	void setPosition(const sf::Vector2f& pPosition) { mSprite.setPosition(pPosition); }
 
+	void toggleSelected() { mSelected = !mSelected; }
+	bool isSelected() const { return mSelected; }
+	void setOutlinePosition() { mOutline.setPosition(mSprite.getPosition()); }
+
 private:
 	sf::Sprite mSprite;
+	sf::RectangleShape mOutline;
+
 	std::string mTextureFilename;
 
 	sf::Vector2f mPosition;

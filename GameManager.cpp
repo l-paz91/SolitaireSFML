@@ -100,6 +100,7 @@ void GameManager::processEvents(const sf::Event& pEvent)
 				{
 					// start dragging the card
 					mDraggedCard = selectedCards[0];
+					mDraggedCard->toggleSelected();
 					mDraggedCardOriginalPosition = mDraggedCard->getSprite().getPosition();
 					mDraggedCardOffset = mDraggedCardOriginalPosition - static_cast<sf::Vector2f>(mousePosition);
 				}
@@ -107,6 +108,12 @@ void GameManager::processEvents(const sf::Event& pEvent)
 				{
 					mDraggedCards = selectedCards;
 					setDraggedCardsOriginalPositions();
+
+					// toggle selected on all cards
+					for (Card* card : mDraggedCards)
+					{
+						card->toggleSelected();
+					}
 				}
 			}
 		}
@@ -165,6 +172,7 @@ void GameManager::processEvents(const sf::Event& pEvent)
 					resetDraggedCardPosition();
 				}
 
+				mDraggedCard->toggleSelected();
 				mDraggedCard = nullptr;
 			}
 			else
@@ -198,6 +206,12 @@ void GameManager::processEvents(const sf::Event& pEvent)
 					resetDraggedCardsPosition();
 				}
 
+				// toggle selected on all cards
+				for (Card* card : mDraggedCards)
+				{
+					card->toggleSelected();
+				}
+
 				mDraggedCards.clear();
 				mDraggedCardsOriginalPositions.clear();
 			}
@@ -229,12 +243,19 @@ void GameManager::update(sf::Time& pDeltaTime)
 			else
 			{
 				const float yOffset = 30.f;
+
 				// we're dragging multiple cards
 				for (uint32_t i = 0; i < mDraggedCards.size(); ++i)
 				{
 					sf::Vector2f newPosition = mousePosition + mDraggedCardOffset;
 					newPosition.y += yOffset * i;
 					mDraggedCards[i]->setPosition(newPosition);
+				}
+
+				// update the position of the outlines
+				for (uint32_t i = 0; i < mDraggedCards.size(); ++i)
+				{
+					mDraggedCards[i]->setOutlinePosition();
 				}
 			}
 		}
@@ -651,6 +672,7 @@ void GameManager::updateDraggedCardPosition(const sf::Vector2f& pNewPosition)
 {
 	// update the position of the card being dragged
 	mDraggedCard->setPosition(pNewPosition);
+	mDraggedCard->setOutlinePosition();
 
 	// update the position of the card being dragged children
 	// to do
