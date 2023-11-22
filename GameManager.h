@@ -75,6 +75,9 @@ private:
 	void handleLeftMouseButtonPress(const sf::Vector2i& pMousePosition);
 	void handleLeftMouseButtonRelease(const sf::Vector2i& pMousePosition);
 	void handleRightMouseButtonRelease(const sf::Vector2i& pMousePosition);
+	void handleDoubleClick(const sf::Vector2i& pMousePosition);
+
+	void sendCardToFoundationPile(const sf::Vector2i& pMousePosition);
 
 	float getCardXVelocity();
 	float getCardYVelocity();
@@ -116,6 +119,10 @@ private:
 	AnimatedCard mAnimatedCard;
 	bool mIsCardBeingDragged;
 	EGameState mGameState;
+
+	sf::Clock mDoubleClickClock;
+	int mClickCountLMB;
+	float mDoubleClickTimer;
 };
 
 // -----------------------------------------------------------------------------

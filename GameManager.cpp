@@ -52,6 +52,9 @@ GameManager::GameManager(sf::RenderWindow& pWindow)
 	}
 
 	mGameState = EGameState::ePLAYING;
+
+	mClickCountLMB = 0;
+	mDoubleClickTimer = 0.2f;
 }
 
 // -----------------------------------------------------------------------------
@@ -94,6 +97,22 @@ void GameManager::processEvents(const sf::Event& pEvent)
 	if (pEvent.type == Event::MouseButtonReleased && pEvent.mouseButton.button == Mouse::Left)
 	{
 		handleLeftMouseButtonRelease(mousePosition);
+
+		float timeSinceLastClick = mDoubleClickClock.getElapsedTime().asSeconds();
+		if (timeSinceLastClick < mDoubleClickTimer)
+		{
+			++mClickCountLMB;
+			if (mClickCountLMB == 2)
+			{
+				handleDoubleClick(mousePosition);
+				mClickCountLMB = 0;
+			}
+		}
+		else
+		{
+			mClickCountLMB = 1;
+			mDoubleClickClock.restart();
+		}
 	}
 
 	// RMB released
@@ -439,7 +458,20 @@ void GameManager::handleRightMouseButtonRelease(const sf::Vector2i& pMousePositi
 {
 	// on release, check if the mouse is over a single card
 	// if it is, check if it's a valid move to the foundation pile
+	sendCardToFoundationPile(pMousePosition);
+}
 
+// -----------------------------------------------------------------------------
+
+void GameManager::handleDoubleClick(const sf::Vector2i& pMousePosition)
+{
+	sendCardToFoundationPile(pMousePosition);
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::sendCardToFoundationPile(const sf::Vector2i& pMousePosition)
+{
 	std::vector<Card*> selectedCards = getCardsAtMousePosition(pMousePosition);
 	mDraggedCardOriginalPile = findPileContainingCard(selectedCards[0]);
 

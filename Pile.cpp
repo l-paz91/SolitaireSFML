@@ -34,6 +34,7 @@ Pile::~Pile()
 void Pile::push(Card* pCard)
 {
 	pCard->getSprite().setPosition(mPosition);
+	pCard->setPosition(mPosition);
 	mCards.push_back(pCard);
 }
 

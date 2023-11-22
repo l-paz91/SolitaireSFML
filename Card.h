@@ -59,7 +59,7 @@ public:
 	bool isBlack() const { return mSuit == eCLUBS || mSuit == eSPADES; }
 	bool isFaceUp() const { return mFaceUp; }
 
-	void setPosition(const sf::Vector2f& pPosition) { mSprite.setPosition(pPosition); }
+	void setPosition(const sf::Vector2f& pPosition) { mSprite.setPosition(pPosition); mPosition = pPosition; }
 
 	void toggleSelected() { mSelected = !mSelected; }
 	bool isSelected() const { return mSelected; }
