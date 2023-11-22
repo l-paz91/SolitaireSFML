@@ -68,7 +68,13 @@ public:
 
 private:
 	void debugWinGame();
+
 	void winAnimation(sf::Time& pDeltaTime);
+
+	// handle mouse events
+	void handleLeftMouseButtonPress(const sf::Vector2i& pMousePosition);
+	void handleLeftMouseButtonRelease(const sf::Vector2i& pMousePosition);
+
 	float getCardXVelocity();
 	float getCardYVelocity();
 

@@ -87,137 +87,13 @@ void GameManager::processEvents(const sf::Event& pEvent)
 	// LMB pressed
 	if (pEvent.type == Event::MouseButtonPressed && pEvent.mouseButton.button == Mouse::Left)
 	{
-		if (!mIsCardBeingDragged)
-		{
-			std::vector<Card*> selectedCards = getCardsAtMousePosition(mousePosition);
-			if (selectedCards.size() > 0)
-			{
-				mIsCardBeingDragged = true;
-				mDraggedCardOriginalPile = findPileContainingCard(selectedCards[0]);
-
-				// are we dragging single or multiple cards?
-				if (selectedCards.size() == 1)
-				{
-					// start dragging the card
-					mDraggedCard = selectedCards[0];
-					mDraggedCard->toggleSelected();
-					mDraggedCardOriginalPosition = mDraggedCard->getSprite().getPosition();
-					mDraggedCardOffset = mDraggedCardOriginalPosition - static_cast<sf::Vector2f>(mousePosition);
-				}
-				else
-				{
-					mDraggedCards = selectedCards;
-					setDraggedCardsOriginalPositions();
-
-					// toggle selected on all cards
-					for (Card* card : mDraggedCards)
-					{
-						card->toggleSelected();
-					}
-				}
-			}
-		}
+		handleLeftMouseButtonPress(mousePosition);
 	}
 
 	// LMB released
 	if (pEvent.type == Event::MouseButtonReleased && pEvent.mouseButton.button == Mouse::Left)
 	{
-		// is the stock empty?
-		if (mBlankSpace.getGlobalBounds().contains(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y)) 
-			&& mDeck.isStockEmpty())
-		{
-			mDeck.reset();
-		}
-
-		// are we hovering over stock?
-		if (mDeck.isMouseOverStock(mousePosition) && !mIsCardBeingDragged)
-		{
-			mDeck.draw();
-
-			// create move history for undo command
-			Undo move(EMoveType::eDRAW, mDeck.peekWaste(), &mDeck.getStock(), &mDeck.getWaste());
-			mMoveHistory.push_back(move);
-			debugPrintMoveHistory();
-		}
-
-		// are dragging a card and releasing it?
-		if (mIsCardBeingDragged)
-		{
-			if (mDraggedCard)
-			{
-				Pile* targetPile = getPileAtMousePosition();
-				if (targetPile && targetPile->isValidMove(mDraggedCard))
-				{
-					// move the card to the target pile
-					targetPile->push(mDraggedCard);
-					mDraggedCardOriginalPile->pop();
-
-					// flip the top card of the original pile
-					if (Card* peekedCard = mDraggedCardOriginalPile->peek())
-					{	
-						if (!peekedCard->isFaceUp())
-						{
-							peekedCard->flip();
-						}
-					}
-
-					// create move history for undo command
-					Undo move(EMoveType::eTRANSFER, mDraggedCard, mDraggedCardOriginalPile, targetPile);
-					mMoveHistory.push_back(move);
-					debugPrintMoveHistory();
-				}
-				else
-				{
-					// invalid move, snap card back to its original position
-					resetDraggedCardPosition();
-				}
-
-				mDraggedCard->toggleSelected();
-				mDraggedCard = nullptr;
-			}
-			else
-			{
-				Pile* targetPile = getPileAtMousePosition();
-				if (targetPile && targetPile->isValidMove(mDraggedCards))
-				{
-					// move the cards to the target pile in the correct order
-					for (Card* card : mDraggedCards)
-					{
-						targetPile->push(card);
-						mDraggedCardOriginalPile->pop();
-					}
-
-					// flip the top card of the original pile
-					if (Card* peekedCard = mDraggedCardOriginalPile->peek())
-					{
-						if (!peekedCard->isFaceUp())
-						{
-							peekedCard->flip();
-						}
-					}
-
-					// create move history for undo command
-					Undo move(EMoveType::eTRANSFER, mDraggedCards, mDraggedCardOriginalPile, targetPile);
-					mMoveHistory.push_back(move);
-					debugPrintMoveHistory();
-				}
-				else
-				{
-					resetDraggedCardsPosition();
-				}
-
-				// toggle selected on all cards
-				for (Card* card : mDraggedCards)
-				{
-					card->toggleSelected();
-				}
-
-				mDraggedCards.clear();
-				mDraggedCardsOriginalPositions.clear();
-			}
-
-			mIsCardBeingDragged = false;
-		}
+		handleLeftMouseButtonRelease(mousePosition);
 	}
 }
 
@@ -457,6 +333,97 @@ void GameManager::winAnimation(sf::Time& pDeltaTime)
 
 // -----------------------------------------------------------------------------
 
+void GameManager::handleLeftMouseButtonPress(const sf::Vector2i& pMousePosition)
+{
+	if (!mIsCardBeingDragged)
+	{
+		std::vector<Card*> selectedCards = getCardsAtMousePosition(pMousePosition);
+		if (selectedCards.size() > 0)
+		{
+			mIsCardBeingDragged = true;
+			mDraggedCardOriginalPile = findPileContainingCard(selectedCards[0]);
+
+			mDraggedCards = selectedCards;
+			setDraggedCardsOriginalPositions();
+
+			// toggle selected on all cards
+			for (Card* card : mDraggedCards)
+			{
+				card->toggleSelected();
+			}
+		}
+	}
+}
+
+// -----------------------------------------------------------------------------
+
+void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePosition)
+{
+	// is the stock empty?
+	if (mBlankSpace.getGlobalBounds().contains(static_cast<float>(pMousePosition.x), static_cast<float>(pMousePosition.y))
+		&& mDeck.isStockEmpty())
+	{
+		mDeck.reset();
+	}
+
+	// are we hovering over stock?
+	if (mDeck.isMouseOverStock(pMousePosition) && !mIsCardBeingDragged)
+	{
+		mDeck.draw();
+
+		// create move history for undo command
+		Undo move(EMoveType::eDRAW, mDeck.peekWaste(), &mDeck.getStock(), &mDeck.getWaste());
+		mMoveHistory.push_back(move);
+		debugPrintMoveHistory();
+	}
+
+	// are dragging a card and releasing it?
+	if (mIsCardBeingDragged)
+	{
+		Pile* targetPile = getPileAtMousePosition();
+		if (targetPile && targetPile->isValidMove(mDraggedCards))
+		{
+			// move the cards to the target pile in the correct order
+			for (Card* card : mDraggedCards)
+			{
+				targetPile->push(card);
+				mDraggedCardOriginalPile->pop();
+			}
+
+			// flip the top card of the original pile
+			if (Card* peekedCard = mDraggedCardOriginalPile->peek())
+			{
+				if (!peekedCard->isFaceUp())
+				{
+					peekedCard->flip();
+				}
+			}
+
+			// create move history for undo command
+			Undo move(EMoveType::eTRANSFER, mDraggedCards, mDraggedCardOriginalPile, targetPile);
+			mMoveHistory.push_back(move);
+			debugPrintMoveHistory();
+		}
+		else
+		{
+			resetDraggedCardsPosition();
+		}
+
+		// toggle selected on all cards
+		for (Card* card : mDraggedCards)
+		{
+			card->toggleSelected();
+		}
+
+		mDraggedCards.clear();
+		mDraggedCardsOriginalPositions.clear();
+
+		mIsCardBeingDragged = false;
+	}
+}
+
+// -----------------------------------------------------------------------------
+
 float GameManager::getCardXVelocity()
 {
 	int left = GameFacilities::randint(-12, -5);
@@ -584,6 +551,7 @@ std::vector<Card*> GameManager::getCardsAtMousePosition(const sf::Vector2i& pMou
 		{
 			card = mFoundations[i].peek();
 			cards.push_back(card);
+			mDraggedCardOffset = card->getSprite().getPosition() - static_cast<sf::Vector2f>(mousePosition);
 			return cards;
 		}
 	}
@@ -593,6 +561,7 @@ std::vector<Card*> GameManager::getCardsAtMousePosition(const sf::Vector2i& pMou
 	{
 		card = mDeck.peekWaste();
 		cards.push_back(card);
+		mDraggedCardOffset = card->getSprite().getPosition() - static_cast<sf::Vector2f>(mousePosition);
 	}
 
 	return cards;
@@ -673,9 +642,6 @@ void GameManager::updateDraggedCardPosition(const sf::Vector2f& pNewPosition)
 	// update the position of the card being dragged
 	mDraggedCard->setPosition(pNewPosition);
 	mDraggedCard->setOutlinePosition();
-
-	// update the position of the card being dragged children
-	// to do
 }
 
 // -----------------------------------------------------------------------------

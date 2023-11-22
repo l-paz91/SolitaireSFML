@@ -48,6 +48,7 @@ public:
 
 	// checks if a card can be moved to the foundation
 	virtual bool isValidMove(Card* pCard) override;
+	virtual bool isValidMove(std::vector<Card*>& pCards) override;
 
 	// debug print to console
 	void printToConsole();

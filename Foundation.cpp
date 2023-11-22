@@ -69,6 +69,40 @@ bool Foundation::isValidMove(Card* pCard)
 
 // -----------------------------------------------------------------------------
 
+bool Foundation::isValidMove(std::vector<Card*>& pCards)
+{
+	// we can only move one card at a time to the foundation
+	if (pCards.size() != 1)
+	{
+		return false;
+	}
+
+	// if the foundation is empty, only an ace can be moved
+	if (isEmpty())
+	{
+		if (pCards[0]->getRank() == ECardRank::eACE)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	// if the pile is not empty, check if the card is the same suit and one rank higher
+	if (pCards[0]->getSuit() == peek()->getSuit() && pCards[0]->getRank() == peek()->getRank() + 1)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+// -----------------------------------------------------------------------------
+
 void Foundation::printToConsole()
 {
 	std::cout << "Foundation: " << std::endl;
@@ -83,6 +117,12 @@ void Foundation::render(sf::RenderWindow& pWindow)
 
 	if (!getCards().empty())
 	{
+		if (getCards().back()->isSelected() && getCards().size() > 1)
+		{
+			// render the card below it instead
+			getCards()[getCards().size() - 2]->render(pWindow);
+		}
+
 		getCards().back()->render(pWindow);		
 	}
 }
