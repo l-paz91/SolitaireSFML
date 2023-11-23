@@ -230,6 +230,9 @@ void GameManager::render()
 			}
 		}
 	}
+
+	// render the status bar
+	mStatusBar.render(mWindowRef);
 }
 
 // -----------------------------------------------------------------------------

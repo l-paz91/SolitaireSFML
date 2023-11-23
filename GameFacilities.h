@@ -56,6 +56,15 @@ namespace GameFacilities
 	{
 		return sf::Vector2f(std::round(pVector2f.x), std::round(pVector2f.y));
 	}
+
+	// -----------------------------------------------------------------------------
+
+	static sf::Font getRobotoRegularFont()
+	{
+		sf::Font font;
+		font.loadFromFile("Fonts/Roboto-Regular.ttf");
+		return font;
+	}
 }
 
 // -----------------------------------------------------------------------------

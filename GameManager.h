@@ -7,8 +7,9 @@
 #include "Card.h"
 #include "Deck.h"
 #include "Foundation.h"
-#include "Tableau.h"
 #include "UndoCommand.h"
+#include "Tableau.h"
+#include "StatusBar.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
@@ -101,6 +102,8 @@ private:
 	sf::Sprite mCardBackSprite;
 	sf::RectangleShape mBlankSpace;
 	sf::RenderWindow& mWindowRef;
+
+	StatusBar mStatusBar;
 
 	Deck mDeck;
 	std::vector<Tableau> mTableaus;
