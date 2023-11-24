@@ -35,7 +35,7 @@ public:
 
 	void setScore(EScoringSystem pScoreType);
 	void decrementScore(int pAmount);
-	void incrementMoves() { ++mMoves; }
+	void incrementMoves();
 	void startTimer() { mTime = 0.f; }
 
 	int getScore() { return mScore; }

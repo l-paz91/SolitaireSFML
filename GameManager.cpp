@@ -393,12 +393,14 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 	{
 		mDeck.reset();
 		mStatusBar.setScore(EScoringSystem::eREFLIP_WASTE);
+		mStatusBar.incrementMoves();
 	}
 
 	// are we hovering over stock?
 	if (mDeck.isMouseOverStock(pMousePosition) && !mIsCardBeingDragged)
 	{
 		mDeck.draw();
+		mStatusBar.incrementMoves();
 
 		// create move history for undo command
 		Undo move(EMoveType::eDRAW, mDeck.peekWaste(), &mDeck.getStock(), EScoringSystem::eDEFAULT, &mDeck.getWaste());
@@ -445,6 +447,7 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 				}
 			}
 
+			mStatusBar.incrementMoves();
 			mMoveHistory.push_back(move);
 			debugPrintMoveHistory();
 		}
@@ -487,10 +490,11 @@ void GameManager::handleDoubleClick(const sf::Vector2i& pMousePosition)
 void GameManager::sendCardToFoundationPile(const sf::Vector2i& pMousePosition)
 {
 	std::vector<Card*> selectedCards = getCardsAtMousePosition(pMousePosition);
-	mDraggedCardOriginalPile = findPileContainingCard(selectedCards[0]);
 
 	if (selectedCards.size() == 1)
 	{
+		mDraggedCardOriginalPile = findPileContainingCard(selectedCards[0]);
+
 		if (Pile* targetPile = getCorrectFoundationPile(selectedCards[0]))
 		{
 			// is it a valid move to the foundation pile?
@@ -526,6 +530,7 @@ void GameManager::sendCardToFoundationPile(const sf::Vector2i& pMousePosition)
 					}
 				}
 
+				mStatusBar.incrementMoves();
 				mMoveHistory.push_back(move);
 				debugPrintMoveHistory();
 			}
@@ -613,7 +618,8 @@ void GameManager::undoMove()
 			// undo drawing a card
 			lastMove.mCards.back()->flip();
 			lastMove.mFromPile->push(lastMove.mCards.back());
-			lastMove.mToPile->pop();		
+			lastMove.mToPile->pop();
+			mStatusBar.incrementMoves();
 			break;
 		}
 		case EMoveType::eTRANSFER:
@@ -647,6 +653,7 @@ void GameManager::undoMove()
 
 			// undo the score
 			mStatusBar.decrementScore(lastMove.mMoveScore);
+			mStatusBar.incrementMoves();
 
 			break;
 		}
