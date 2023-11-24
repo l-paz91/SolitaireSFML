@@ -24,6 +24,8 @@ Tableau::Tableau(const sf::Vector2f& pPosition)
 	mBlankSpace.setScale(0.2f, 0.2f);
 	mBlankSpace.setColor(sf::Color(27, 18, 18, 100));
 	setPosition(pPosition);
+
+	setPileType(EPileType::eTABLEAU);
 }
 
 // -----------------------------------------------------------------------------

@@ -4,14 +4,14 @@
 // -----------------------------------------------------------------------------
 
 //--INCLUDES--//
+#include "ScoringSystem.h"
+
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Font.hpp>
 
-
 // -----------------------------------------------------------------------------
-
 
 /*
 	// ---- Status Bar ----//
@@ -30,17 +30,17 @@ public:
 	StatusBar();
 	~StatusBar() {}
 
-	void update(float pDeltaTimeAsSeconds);
+	void update(float pDeltaTimeAsSeconds, EScoringSystem pScoreType);
 	void render(sf::RenderWindow& pWindow);
 
-	void setScore();
+	void setScore(EScoringSystem pScoreType);
+	void decrementScore(int pAmount);
 	void incrementMoves() { ++mMoves; }
 	void startTimer() { mTime = 0.f; }
 
 	int getScore() { return mScore; }
 	int getMoves() { return mMoves; }
 	float getTime() { return mTime; }
-
 
 private:
 	sf::RectangleShape mStatusBar;

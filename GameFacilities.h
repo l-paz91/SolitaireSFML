@@ -59,10 +59,10 @@ namespace GameFacilities
 
 	// -----------------------------------------------------------------------------
 
-	static sf::Font getRobotoRegularFont()
+	static sf::Font getIMFellFrenchCannonFont()
 	{
 		sf::Font font;
-		font.loadFromFile("Fonts/Roboto-Regular.ttf");
+		font.loadFromFile("Fonts/FeFCrm2.ttf");
 		return font;
 	}
 }

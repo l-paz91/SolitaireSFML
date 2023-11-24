@@ -10,7 +10,9 @@
 // -----------------------------------------------------------------------------
 
 Pile::Pile(const sf::Vector2f& pPosition)
-	: mPosition(pPosition)
+	: mCards()
+	, mPosition(pPosition)
+	, mPileType(EPileType::eDEFAULT)
 {
 
 }

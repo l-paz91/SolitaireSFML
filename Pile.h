@@ -22,6 +22,17 @@
 
 // -----------------------------------------------------------------------------
 
+enum class EPileType
+{
+	eDEFAULT,
+	eTABLEAU,
+	eFOUNDATION,
+	eWASTE,
+	eSTOCK
+};
+
+// -----------------------------------------------------------------------------
+
 class Pile
 {
 public:
@@ -67,9 +78,14 @@ public:
 	virtual void printName() { std::cout << "Pile" << std::endl;}
 	virtual int getID() { return -1; }
 
+	void setPileType(EPileType pType) { mPileType = pType; }
+	EPileType getPileType() { return mPileType; }
+
 private:
 	std::vector<Card*> mCards;
 	sf::Vector2f mPosition;
+
+	EPileType mPileType;
 };
 
 // -----------------------------------------------------------------------------

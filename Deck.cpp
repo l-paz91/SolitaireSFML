@@ -47,6 +47,9 @@ Deck::Deck()
 	mStock.shuffle();
 
 	//printStockToConsole();
+
+	mWaste.setPileType(EPileType::eWASTE);
+	mStock.setPileType(EPileType::eSTOCK);
 }
 
 // -----------------------------------------------------------------------------

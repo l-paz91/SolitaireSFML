@@ -392,6 +392,7 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 		&& mDeck.isStockEmpty())
 	{
 		mDeck.reset();
+		mStatusBar.setScore(EScoringSystem::eREFLIP_WASTE);
 	}
 
 	// are we hovering over stock?
@@ -400,7 +401,7 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 		mDeck.draw();
 
 		// create move history for undo command
-		Undo move(EMoveType::eDRAW, mDeck.peekWaste(), &mDeck.getStock(), &mDeck.getWaste());
+		Undo move(EMoveType::eDRAW, mDeck.peekWaste(), &mDeck.getStock(), EScoringSystem::eDEFAULT, &mDeck.getWaste());
 		mMoveHistory.push_back(move);
 		debugPrintMoveHistory();
 	}
@@ -418,8 +419,13 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 				mDraggedCardOriginalPile->pop();
 			}
 
+			// determine the score
+			EPileType fromPileType = mDraggedCardOriginalPile->getPileType();
+			EPileType toPileType = targetPile->getPileType();
+			EScoringSystem scoreType = determineScore(fromPileType, toPileType);
+
 			// create move history for undo command
-			Undo move(EMoveType::eTRANSFER, mDraggedCards, mDraggedCardOriginalPile, targetPile);
+			Undo move(EMoveType::eTRANSFER, mDraggedCards, mDraggedCardOriginalPile, scoreType, targetPile);
 
 			// flip the top card of the original pile
 			if (Card* peekedCard = mDraggedCardOriginalPile->peek())
@@ -427,6 +433,11 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 				if (!peekedCard->isFaceUp())
 				{
 					peekedCard->flip();
+					if (mDraggedCardOriginalPile->getPileType() == EPileType::eTABLEAU)
+					{
+						mStatusBar.setScore(EScoringSystem::eFLIP_TABLEAU_CARD);
+						move.mMoveScore += EScoringSystem::eFLIP_TABLEAU_CARD;
+					}
 				}
 				else
 				{
@@ -489,8 +500,13 @@ void GameManager::sendCardToFoundationPile(const sf::Vector2i& pMousePosition)
 				targetPile->push(selectedCards[0]);
 				mDraggedCardOriginalPile->pop();
 
+				// determine the score
+				EPileType fromPileType = mDraggedCardOriginalPile->getPileType();
+				EPileType toPileType = targetPile->getPileType();
+				EScoringSystem scoreType = determineScore(fromPileType, toPileType);
+
 				// create move history for undo command
-				Undo move(EMoveType::eTRANSFER, selectedCards, mDraggedCardOriginalPile, targetPile);
+				Undo move(EMoveType::eTRANSFER, selectedCards, mDraggedCardOriginalPile, scoreType, targetPile);
 
 				// flip the top card of the original pile
 				if (Card* peekedCard = mDraggedCardOriginalPile->peek())
@@ -498,6 +514,11 @@ void GameManager::sendCardToFoundationPile(const sf::Vector2i& pMousePosition)
 					if (!peekedCard->isFaceUp())
 					{
 						peekedCard->flip();
+						if (mDraggedCardOriginalPile->getPileType() == EPileType::eTABLEAU)
+						{
+							mStatusBar.setScore(EScoringSystem::eFLIP_TABLEAU_CARD);
+							move.mMoveScore += EScoringSystem::eFLIP_TABLEAU_CARD;
+						}
 					}
 					else
 					{
@@ -514,6 +535,34 @@ void GameManager::sendCardToFoundationPile(const sf::Vector2i& pMousePosition)
 			}
 		}
 	}
+}
+
+// -----------------------------------------------------------------------------
+
+EScoringSystem GameManager::determineScore(EPileType pFromPile, EPileType pToPile)
+{
+	if (pFromPile == EPileType::eTABLEAU && pToPile == EPileType::eFOUNDATION)
+	{
+		mStatusBar.setScore(EScoringSystem::eTABLEAU_TO_FOUNDATION);
+		return EScoringSystem::eTABLEAU_TO_FOUNDATION;
+	}
+	else if (pFromPile == EPileType::eFOUNDATION && pToPile == EPileType::eTABLEAU)
+	{
+		mStatusBar.setScore(EScoringSystem::eFOUNDATION_TO_TABLEAU);
+		return EScoringSystem::eFOUNDATION_TO_TABLEAU;
+	}
+	else if (pFromPile == EPileType::eWASTE && pToPile == EPileType::eFOUNDATION)
+	{
+		mStatusBar.setScore(EScoringSystem::eWASTE_TO_FOUNDATION);
+		return EScoringSystem::eWASTE_TO_FOUNDATION;
+	}
+	else if (pFromPile == EPileType::eWASTE && pToPile == EPileType::eTABLEAU)
+	{
+		mStatusBar.setScore(EScoringSystem::eWASTE_TO_TABLEAU);
+		return EScoringSystem::eWASTE_TO_TABLEAU;
+	}
+
+	return EScoringSystem::eDEFAULT;
 }
 
 // -----------------------------------------------------------------------------
@@ -564,7 +613,7 @@ void GameManager::undoMove()
 			// undo drawing a card
 			lastMove.mCards.back()->flip();
 			lastMove.mFromPile->push(lastMove.mCards.back());
-			lastMove.mToPile->pop();
+			lastMove.mToPile->pop();		
 			break;
 		}
 		case EMoveType::eTRANSFER:
@@ -595,6 +644,9 @@ void GameManager::undoMove()
 					lastMove.mToPile->pop();
 				}
 			}
+
+			// undo the score
+			mStatusBar.decrementScore(lastMove.mMoveScore);
 
 			break;
 		}

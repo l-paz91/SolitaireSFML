@@ -79,6 +79,7 @@ private:
 	void handleDoubleClick(const sf::Vector2i& pMousePosition);
 
 	void sendCardToFoundationPile(const sf::Vector2i& pMousePosition);
+	EScoringSystem determineScore(EPileType pFromPile, EPileType pToPile);
 
 	float getCardXVelocity();
 	float getCardYVelocity();

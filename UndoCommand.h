@@ -6,11 +6,13 @@
 //--INCLUDES--//
 #include "Card.h"
 #include "Pile.h"
+#include "ScoringSystem.h"
+
 #include <iostream>
 
 // -----------------------------------------------------------------------------
 
-enum EMoveType
+enum class EMoveType
 {
 	eDRAW,			// we've drawn a card from the deck
 	eRESET,			// the card has snapped back to its original position
@@ -24,27 +26,30 @@ enum EMoveType
 struct Undo
 {
 	Undo()
-		: mMoveType(eDEFAULT)
+		: mMoveType(EMoveType::eDEFAULT)
 		, mCards()
 		, mFromPile(nullptr)
 		, mToPile(nullptr)
+		, mMoveScore(0)
 		, mOriginalFaceUpState(false)
 	{}
 
-	Undo(EMoveType pMoveType, const std::vector<Card*>& pCard, Pile* pFromPile, Pile* pToPile)
+	Undo(EMoveType pMoveType, const std::vector<Card*>& pCard, Pile* pFromPile, EScoringSystem pScore, Pile* pToPile)
 		: mMoveType(pMoveType)
 		, mCards(pCard)
 		, mFromPile(pFromPile)
 		, mToPile(pToPile)
+		, mMoveScore(pScore)
 		, mOriginalFaceUpState(false)
 	{
 	}
 
-	Undo(EMoveType pMoveType, Card* pCard, Pile* pFromPile, Pile* pToPile)
+	Undo(EMoveType pMoveType, Card* pCard, Pile* pFromPile, EScoringSystem pScore, Pile* pToPile)
 		: mMoveType(pMoveType)
 		, mCards()
 		, mFromPile(pFromPile)
 		, mToPile(pToPile)
+		, mMoveScore(pScore)
 		, mOriginalFaceUpState(false)
 	{
 		mCards.push_back(pCard);
@@ -55,7 +60,7 @@ struct Undo
 	void debugPrint()
 	{
 		std::cout << "Undo: || ";
-		std::cout << "MoveType: " << mMoveType;
+		std::cout << "MoveType: " << static_cast<int>(mMoveType);
 		std::cout << " || Cards: ";
 		for (Card* card : mCards)
 		{
@@ -73,6 +78,7 @@ struct Undo
 	std::vector<Card*> mCards;	// the card(s) that moved
 	Pile* mFromPile;			// the pile the card was moved from
 	Pile* mToPile;				// the pile the card was moved to
+	int mMoveScore;				// the score of the move
 	bool mOriginalFaceUpState;	// the original face up state of the card below it
 };
 
