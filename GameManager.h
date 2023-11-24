@@ -93,8 +93,6 @@ private:
 	Pile* getPileAtMousePosition();
 	Pile* getCorrectFoundationPile(Card* pSelectedCard);
 
-	void updateDraggedCardPosition(const sf::Vector2f& pNewPosition);
-	void resetDraggedCardPosition();
 	void resetDraggedCardsPosition();
 	void setDraggedCardsOriginalPositions();
 
@@ -113,7 +111,6 @@ private:
 	std::vector<Card*> mDraggedCards;
 	std::vector<sf::Vector2f> mDraggedCardsOriginalPositions;
 
-	Card* mDraggedCard;
 	Pile* mDraggedCardOriginalPile;
 	sf::Vector2f mDraggedCardOriginalPosition;
 	sf::Vector2f mDraggedCardOffset;

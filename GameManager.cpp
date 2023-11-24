@@ -143,12 +143,7 @@ void GameManager::update(sf::Time& pDeltaTime)
 			const sf::Vector2f mousePosition = static_cast<sf::Vector2f>(sf::Mouse::getPosition(mWindowRef));
 			sf::Vector2f newPosition = mousePosition + mDraggedCardOffset;
 
-			if (mDraggedCard)
-			{
-				sf::Vector2f newPosition = mousePosition + mDraggedCardOffset;
-				updateDraggedCardPosition(newPosition);
-			}
-			else
+			if (mDraggedCards.size())
 			{
 				const float yOffset = 30.f;
 
@@ -224,11 +219,7 @@ void GameManager::render()
 
 		if (mIsCardBeingDragged)
 		{
-			if (mDraggedCard)
-			{
-				mDraggedCard->render(mWindowRef);
-			}
-			else
+			if (mDraggedCards.size())
 			{
 				for (Card* card : mDraggedCards)
 				{
@@ -544,10 +535,6 @@ void GameManager::sendCardToFoundationPile(const sf::Vector2i& pMousePosition)
 				mMoveHistory.push_back(move);
 				debugPrintMoveHistory();
 			}
-			else
-			{
-				resetDraggedCardPosition();
-			}
 		}
 	}
 }
@@ -825,23 +812,6 @@ Pile* GameManager::getCorrectFoundationPile(Card* pSelectedCard)
 	}
 
 	return nullptr;
-}
-
-// -----------------------------------------------------------------------------
-
-void GameManager::updateDraggedCardPosition(const sf::Vector2f& pNewPosition)
-{
-	// update the position of the card being dragged
-	mDraggedCard->setPosition(pNewPosition);
-	mDraggedCard->setOutlinePosition();
-}
-
-// -----------------------------------------------------------------------------
-
-void GameManager::resetDraggedCardPosition()
-{
-	// reset the position of the card being dragged
-	mDraggedCard->setPosition(mDraggedCardOriginalPosition);
 }
 
 // -----------------------------------------------------------------------------
