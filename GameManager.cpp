@@ -4,6 +4,7 @@
 #include "GameManager.h"
 #include "GameFacilities.h"
 #include "TextureManager.h"
+#include "SoundManager.h"
 
 #include <SFML/Window/Event.hpp>
 
@@ -55,6 +56,9 @@ GameManager::GameManager(sf::RenderWindow& pWindow)
 
 	mClickCountLMB = 0;
 	mDoubleClickTimer = 0.2f;
+
+	// load background music
+	SoundManager::loadMusic("Cocktail-Hour-Aaron-Kenny", "Sounds/Cocktail-Hour-Aaron-Kenny.ogg");
 }
 
 // -----------------------------------------------------------------------------
@@ -251,6 +255,9 @@ void GameManager::beginGame()
 {
 	if (mGameState == ePLAYING)
 	{
+		// start background music
+		SoundManager::playMusic("Cocktail-Hour-Aaron-Kenny");
+
 		// deal cards to tableau piles from the deck
 		for (int i = 0; i < 7; ++i)
 		{

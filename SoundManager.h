@@ -7,6 +7,7 @@
 #include <iostream>
 #include <map>
 #include <SFML/Audio.hpp>
+#include <SFML/Audio/Music.hpp>
 
 // -----------------------------------------------------------------------------
 
@@ -51,6 +52,59 @@ public:
 		}
 	}
 
+	// load a music file
+	static void loadMusic(const std::string& pMusicFile, const std::string& pFilename)
+	{
+		auto& instance = getInstance();
+
+		// check if the music file is already loaded
+		auto iterator = instance.mMusicTracks.find(pMusicFile);
+		if (iterator == instance.mMusicTracks.end())
+		{
+			// create a new unique pointer to a music track
+			std::unique_ptr<sf::Music> music = std::make_unique<sf::Music>();
+
+			// try to load the music track
+			if (!music->openFromFile(pFilename))
+			{
+				std::cout << "SoundManager::loadMusic(): Issue loading file " << pFilename << '\n';
+				return;
+			}
+			else
+			{
+				instance.mMusicTracks.emplace(pMusicFile, std::move(music));
+			}
+		}
+	}
+
+	// play a music file
+	static void playMusic(const std::string& pMusicFile)
+	{
+		auto iterator = getInstance().mMusicTracks.find(pMusicFile);
+		if (iterator != getInstance().mMusicTracks.end())
+		{
+			iterator->second->play();
+		}
+		else
+		{
+			std::cout << "SoundManager::playMusic(): Music " << pMusicFile << " was not found.\n";
+		}
+	}
+
+	// stop a music file
+	static void stopMusic(const std::string& pMusicFile)
+	{
+		auto iterator = getInstance().mMusicTracks.find(pMusicFile);
+		if (iterator != getInstance().mMusicTracks.end())
+		{
+			iterator->second->stop();
+		}
+		else
+		{
+			std::cout << "SoundManager::stopMusic(): Music " << pMusicFile << " was not found.\n";
+		}
+	}
+
 private:
 	SoundManager() {}
 
@@ -62,6 +116,7 @@ private:
 
 	std::map<std::string, sf::SoundBuffer> mSoundBuffers;
 	std::map<std::string, sf::Sound> mSounds;
+	std::map<std::string, std::unique_ptr<sf::Music>> mMusicTracks;
 };
 
 // -----------------------------------------------------------------------------
