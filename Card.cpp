@@ -10,25 +10,35 @@
 
 // -----------------------------------------------------------------------------
 
-Card::Card(ECardRank pRank, ECardSuit pSuit, bool pFaceUp, const std::string& pFilename)
-	: mTextureFilename(pFilename)
+namespace CardPrivate
+{
+	// offset into sprite sheet for card back design
+	const sf::IntRect cardBackRect(0, 680, 118, 170);
+}
+
+// -----------------------------------------------------------------------------
+
+Card::Card(ECardRank pRank, ECardSuit pSuit, bool pFaceUp, const sf::IntRect& pSpritesheetOffset)
+	: mSpritesheetOffset(pSpritesheetOffset)
 	, mRank(pRank)
 	, mSuit(pSuit)
 	, mFaceUp(pFaceUp)
 	, mSelected(false)
 {
+	const std::string filename = "Graphics/CardSpritesheet.png";
+	mSprite.setTexture(TextureManager::getTexture(filename));
+
 	// set up card back sprite
 	if (!mFaceUp)
 	{
-		const std::string cardBackFilename = "Graphics/BackDesign.png";
-		mSprite.setTexture(TextureManager::getTexture(cardBackFilename));
+		mSprite.setTextureRect(CardPrivate::cardBackRect);
 	}
 	else
 	{
-		mSprite.setTexture(TextureManager::getTexture(pFilename));
+		mSprite.setTextureRect(pSpritesheetOffset);
 	}
 
-	mSprite.setScale(0.2f, 0.2f);
+	//mSprite.setScale(0.2f, 0.2f);
 	mSprite.setPosition(20.f, 20.f);
 
 	mPosition = mSprite.getPosition();
@@ -68,12 +78,11 @@ void Card::flip()
 
 	if (mFaceUp)
 	{
-		mSprite.setTexture(TextureManager::getTexture(mTextureFilename));
+		mSprite.setTextureRect(mSpritesheetOffset);
 	}
 	else
 	{
-		const std::string cardBackFilename = "Graphics/BackDesign.png";
-		mSprite.setTexture(TextureManager::getTexture(cardBackFilename));
+		mSprite.setTextureRect(CardPrivate::cardBackRect);
 	}
 }
 

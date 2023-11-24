@@ -12,8 +12,8 @@
 Foundation::Foundation(const sf::Vector2f& pPosition)
 	: Pile(pPosition)
 {
-	mBlankSpace.setTexture(TextureManager::getTexture("Graphics/BackDesign.png"));
-	mBlankSpace.setScale(0.2f, 0.2f);
+	mBlankSpace.setTexture(TextureManager::getTexture("Graphics/CardSpritesheet.png"));
+	mBlankSpace.setTextureRect(sf::IntRect(0, 680, 118, 170));
 	mBlankSpace.setColor(sf::Color(27, 18, 18, 100));
 	setPosition(pPosition);
 

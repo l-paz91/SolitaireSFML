@@ -21,8 +21,8 @@ GameManager::GameManager(sf::RenderWindow& pWindow)
 	: mWindowRef(pWindow)
 {
 	// set up card back sprite
-	mCardBackSprite.setTexture(TextureManager::getTexture("Graphics/BackDesign.png"));
-	mCardBackSprite.setScale(0.2f, 0.2f);
+	mCardBackSprite.setTexture(TextureManager::getTexture("Graphics/CardSpritesheet.png"));
+	mCardBackSprite.setTextureRect(sf::IntRect(0, 680, 118, 170));
 	mCardBackSprite.setPosition(20.f, 20.f);
 
 	// set up the blank space

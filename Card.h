@@ -5,6 +5,7 @@
 
 //--INCLUDES--//
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <string>
@@ -34,7 +35,7 @@ enum ECardSuit
 class Card
 {
 public:
-	Card(ECardRank pRank, ECardSuit pSuit, bool pFaceUp, const std::string& pFilename);
+	Card(ECardRank pRank, ECardSuit pSuit, bool pFaceUp, const sf::IntRect& pSpritesheetOffset);
 	~Card();
 
 	// core basics
@@ -69,7 +70,7 @@ private:
 	sf::Sprite mSprite;
 	sf::RectangleShape mOutline;
 
-	std::string mTextureFilename;
+	sf::IntRect mSpritesheetOffset;
 
 	sf::Vector2f mPosition;
 

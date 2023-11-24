@@ -10,37 +10,57 @@ Deck::Deck()
 	: mStock(sf::Vector2f(20.f, 20.f))
 	, mWaste(sf::Vector2f(160.f, 20.f))
 {
+	const std::string filename = "Graphics/CardSpritesheet.png";
+
+	int xStart = 0;
+	int yStart = 0;
+	constexpr int width = 118;
+	constexpr int height = 170;
+
 	// create a deck of cards
 	// heart suit
-	for (int rank = 13; rank > 0; --rank)
+	for (int rank = ECardRank::eACE; rank < 14; ++rank)
 	{
-		const std::string filename = "Graphics/Hearts/" + std::to_string(rank) + ".png";
+		const sf::IntRect spriteOffset(xStart, yStart, width, height);
+		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eHEARTS, false, spriteOffset));
 
-		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eHEARTS, false, filename));
+		xStart += width;
 	}
+
+	xStart = 0;
+	yStart += height;
 
 	// diamond suit
-	for (int rank = 13; rank > 0; --rank)
+	for (int rank = ECardRank::eACE; rank < 14; ++rank)
 	{
-		const std::string filename = "Graphics/Diamonds/" + std::to_string(rank) + ".png";
+		const sf::IntRect spriteOffset(xStart, yStart, width, height);
+		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eDIAMONDS, false, spriteOffset));
 
-		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eDIAMONDS, false, filename));
+		xStart += width;
 	}
+
+	xStart = 0;
+	yStart += height;
 
 	// club suit
-	for (int rank = 13; rank > 0; --rank)
+	for (int rank = ECardRank::eACE; rank < 14; ++rank)
 	{
-		const std::string filename = "Graphics/Clubs/" + std::to_string(rank) + ".png";
+		const sf::IntRect spriteOffset(xStart, yStart, width, height);
+		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eCLUBS, false, spriteOffset));
 
-		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eCLUBS, false, filename));
+		xStart += width;
 	}
 
-	// spade suit
-	for (int rank = 13; rank > 0; --rank)
-	{
-		const std::string filename = "Graphics/Spades/" + std::to_string(rank) + ".png";
+	xStart = 0;
+	yStart += height;
 
-		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eSPADES, false, filename));
+	// spade suit
+	for (int rank = ECardRank::eACE; rank < 14; ++rank)
+	{
+		const sf::IntRect spriteOffset(xStart, yStart, width, height);
+		mStock.push(new Card(static_cast<ECardRank>(rank), ECardSuit::eSPADES, false, spriteOffset));
+
+		xStart += width;
 	}
 
 	// shuffle the deck
