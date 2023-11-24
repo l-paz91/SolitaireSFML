@@ -30,7 +30,7 @@ public:
 	StatusBar();
 	~StatusBar() {}
 
-	void update(float pDeltaTimeAsSeconds, EScoringSystem pScoreType);
+	void update(float pDeltaTimeAsSeconds);
 	void render(sf::RenderWindow& pWindow);
 
 	void setScore(EScoringSystem pScoreType);

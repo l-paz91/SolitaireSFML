@@ -130,6 +130,9 @@ void GameManager::update(sf::Time& pDeltaTime)
 
 	if (mGameState == ePLAYING)
 	{
+		// update timer on status bar
+		mStatusBar.update(deltaTimeSeconds);
+
 		if (mIsCardBeingDragged)
 		{
 			// get the mouse position

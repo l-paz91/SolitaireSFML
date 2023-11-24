@@ -5,6 +5,9 @@
 
 #include "GameFacilities.h"
 
+#include <iomanip>
+#include <sstream>
+
 // -----------------------------------------------------------------------------
 
 StatusBar::StatusBar()
@@ -32,9 +35,23 @@ StatusBar::StatusBar()
 
 // -----------------------------------------------------------------------------
 
-void StatusBar::update(float pDeltaTimeAsSeconds, EScoringSystem pScoreType)
+void StatusBar::update(float pDeltaTimeAsSeconds)
 {
+	mTime += pDeltaTimeAsSeconds;
 
+	// calculate minutes and seconds
+	int totalSeconds = static_cast<int>(mTime);
+	int minutes = totalSeconds / 60;
+	int seconds = totalSeconds % 60;
+
+	// create a stringstream for formatting
+	std::stringstream timeStream;
+
+	// use setfill and setw to format the output like "00:00"
+	timeStream << std::setfill('0') << std::setw(2) << minutes << ":"
+			   << std::setfill('0') << std::setw(2) << seconds;
+
+	mTimeText.setString(timeStream.str());
 }
 
 // -----------------------------------------------------------------------------
