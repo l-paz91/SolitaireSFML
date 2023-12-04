@@ -13,6 +13,11 @@
 namespace GameManagerPrivate
 {
 	const float TIME_PER_CARD = 5.0f;
+
+	const std::string cardFlipSFX = "CardFlip";
+	const std::string cardPickUpSFX = "CardPickUp";
+	const std::string cardPlaceSFX = "CardPlace";
+
 }
 
 // -----------------------------------------------------------------------------
@@ -59,6 +64,11 @@ GameManager::GameManager(sf::RenderWindow& pWindow)
 
 	// load background music
 	SoundManager::loadMusic("Cocktail-Hour-Aaron-Kenny", "Sounds/Cocktail-Hour-Aaron-Kenny.ogg");
+
+	// load sound effects
+	SoundManager::loadSound(GameManagerPrivate::cardFlipSFX, "Sounds/CardFlip.wav");
+	SoundManager::loadSound(GameManagerPrivate::cardPlaceSFX, "Sounds/CardPlace.wav");
+	SoundManager::loadSound(GameManagerPrivate::cardPickUpSFX, "Sounds/CardPick.wav");
 }
 
 // -----------------------------------------------------------------------------
@@ -372,6 +382,8 @@ void GameManager::handleLeftMouseButtonPress(const sf::Vector2i& pMousePosition)
 			mIsCardBeingDragged = true;
 			mDraggedCardOriginalPile = findPileContainingCard(selectedCards[0]);
 
+			SoundManager::playSound(GameManagerPrivate::cardPickUpSFX);
+
 			mDraggedCards = selectedCards;
 			setDraggedCardsOriginalPositions();
 
@@ -395,6 +407,9 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 		mDeck.reset();
 		mStatusBar.setScore(EScoringSystem::eREFLIP_WASTE);
 		mStatusBar.incrementMoves();
+
+		// play sound effect
+		SoundManager::playSound(GameManagerPrivate::cardFlipSFX);
 	}
 
 	// are we hovering over stock?
@@ -402,6 +417,7 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 	{
 		mDeck.draw();
 		mStatusBar.incrementMoves();
+		SoundManager::playSound(GameManagerPrivate::cardPickUpSFX);
 
 		// create move history for undo command
 		Undo move(EMoveType::eDRAW, mDeck.peekWaste(), &mDeck.getStock(), EScoringSystem::eDEFAULT, &mDeck.getWaste());
@@ -422,6 +438,8 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 				mDraggedCardOriginalPile->pop();
 			}
 
+			SoundManager::playSound(GameManagerPrivate::cardPlaceSFX);
+
 			// determine the score
 			EPileType fromPileType = mDraggedCardOriginalPile->getPileType();
 			EPileType toPileType = targetPile->getPileType();
@@ -436,6 +454,8 @@ void GameManager::handleLeftMouseButtonRelease(const sf::Vector2i& pMousePositio
 				if (!peekedCard->isFaceUp())
 				{
 					peekedCard->flip();
+					SoundManager::playSound(GameManagerPrivate::cardFlipSFX);
+
 					if (mDraggedCardOriginalPile->getPileType() == EPileType::eTABLEAU)
 					{
 						mStatusBar.setScore(EScoringSystem::eFLIP_TABLEAU_CARD);
@@ -477,6 +497,8 @@ void GameManager::handleRightMouseButtonRelease(const sf::Vector2i& pMousePositi
 	// on release, check if the mouse is over a single card
 	// if it is, check if it's a valid move to the foundation pile
 	sendCardToFoundationPile(pMousePosition);
+
+	SoundManager::playSound(GameManagerPrivate::cardPlaceSFX);
 }
 
 // -----------------------------------------------------------------------------
@@ -484,6 +506,8 @@ void GameManager::handleRightMouseButtonRelease(const sf::Vector2i& pMousePositi
 void GameManager::handleDoubleClick(const sf::Vector2i& pMousePosition)
 {
 	sendCardToFoundationPile(pMousePosition);
+
+	SoundManager::playSound(GameManagerPrivate::cardPlaceSFX);
 }
 
 // -----------------------------------------------------------------------------
