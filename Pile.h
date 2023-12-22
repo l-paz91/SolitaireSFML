@@ -37,7 +37,7 @@ class Pile
 {
 public:
 	Pile(const sf::Vector2f& pPosition);
-	~Pile();
+	virtual ~Pile();
 
 	// add a card to the top of the pile
 	virtual void push(Card* pCard);
