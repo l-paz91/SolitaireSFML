@@ -506,8 +506,6 @@ void GameManager::handleRightMouseButtonRelease(const sf::Vector2i& pMousePositi
 void GameManager::handleDoubleClick(const sf::Vector2i& pMousePosition)
 {
 	sendCardToFoundationPile(pMousePosition);
-
-	SoundManager::playSound(GameManagerPrivate::cardPlaceSFX);
 }
 
 // -----------------------------------------------------------------------------
@@ -723,19 +721,23 @@ std::vector<Card*> GameManager::getCardsAtMousePosition(const sf::Vector2i& pMou
 	{
 		if (mFoundations[i].isMouseOverTopCard(mousePosition))
 		{
-			card = mFoundations[i].peek();
-			cards.push_back(card);
-			mDraggedCardOffset = card->getSprite().getPosition() - static_cast<sf::Vector2f>(mousePosition);
-			return cards;
+			if (card = mFoundations[i].peek())
+			{
+				cards.push_back(card);
+				mDraggedCardOffset = card->getSprite().getPosition() - static_cast<sf::Vector2f>(mousePosition);
+				return cards;
+			}
 		}
 	}
 
 	// check the waste pile
 	if (mDeck.isMouseOverWaste(pMousePosition))
 	{
-		card = mDeck.peekWaste();
-		cards.push_back(card);
-		mDraggedCardOffset = card->getSprite().getPosition() - static_cast<sf::Vector2f>(mousePosition);
+		if (card = mDeck.peekWaste())
+		{
+			cards.push_back(card);
+			mDraggedCardOffset = card->getSprite().getPosition() - static_cast<sf::Vector2f>(mousePosition);
+		}
 	}
 
 	return cards;
