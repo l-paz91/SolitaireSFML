@@ -721,6 +721,13 @@ std::vector<Card*> GameManager::getCardsAtMousePosition(const sf::Vector2i& pMou
 	// check the foundation piles
 	for (uint32_t i = 0; i < mFoundations.size(); ++i)
 	{
+		// Sorry if this breaks more than it fixes. -Alex
+		if (mFoundations[i].isEmpty())
+		{
+			std::cout << "Foundation [" << i << "] empty, ignoring." << std::endl;
+			continue;
+		}
+
 		if (mFoundations[i].isMouseOverTopCard(mousePosition))
 		{
 			card = mFoundations[i].peek();
